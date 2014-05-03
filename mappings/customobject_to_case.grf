@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="Marek" created="Sat May 03 21:06:59 CEST 2014" description="Case to CustomObject" guiVersion="3.4.3.P" id="1399147265113" licenseCode="Unlicensed" licenseType="Unknown" modified="Sat May 03 21:06:59 CEST 2014" modifiedBy="Marek" name="Case_to_CustomObject" revision="1.0" showComponentDetails="false">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="Marek" created="Sat May 03 21:06:59 CEST 2014" description="Customobject To Case" guiVersion="3.4.3.P" id="1399147434915" licenseCode="Unlicensed" licenseType="Unknown" modified="Sat May 03 21:06:59 CEST 2014" modifiedBy="Marek" name="Customobject_To_Case" revision="1.0" showComponentDetails="false">
 <Global>
-<Metadata __index="0" __referenceCounter="1" __sourcePath="{}/Case" _dataStructure="OBJECT" _id="__id" _type="Input" id="49eea395-59de-49d2-82c2-ba5e0464f634">
+<Metadata __index="0" __referenceCounter="1" __sourcePath="{}/Case" _dataStructure="OBJECT" _id="__id" _type="Output" id="e695bc0d-ab14-40ca-81f2-84a3ba1a78b0">
 <Record fieldDelimiter="," name="Case" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
 <Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
 <Field __implementationClass="java.lang.String" __index="22" __sourcePath="{}/Case/AccountId" containerType="SINGLE" label="AccountId" name="AccountId" type="string"/>
@@ -37,7 +37,7 @@
 <Field __index="2" __sourcePath="{}/Case/Type" containerType="SINGLE" label="Type" name="Type" type="string"/>
 </Record>
 </Metadata>
-<Metadata __index="0" __referenceCounter="1" __sourcePath="{}/Case_x005f_x005fc" _dataStructure="OBJECT" _id="__id" _type="Output" id="1c98a743-96c4-49c3-877c-fb564dddff55">
+<Metadata __index="0" __referenceCounter="1" __sourcePath="{}/Case_x005f_x005fc" _dataStructure="OBJECT" _id="__id" _type="Input" id="cf2d61c9-57b7-41f6-948d-2727e7d02dd0">
 <Record fieldDelimiter="," name="Case__c" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
 <Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
 <Field __implementationClass="java.lang.String" __index="0" __sourcePath="{}/Case_x005f_x005fc/Account_x005f_x005fc" containerType="SINGLE" label="Account__c" name="Account__c" type="string"/>
@@ -50,6 +50,7 @@
 <Field __implementationClass="java.lang.Boolean" __index="14" __sourcePath="{}/Case_x005f_x005fc/IsDeleted" containerType="SINGLE" label="IsDeleted" name="IsDeleted" type="boolean"/>
 <Field __implementationClass="java.lang.String" __index="1" __sourcePath="{}/Case_x005f_x005fc/LastModifiedById" containerType="SINGLE" label="LastModifiedById" name="LastModifiedById" type="string"/>
 <Field __dmType="Calendar" __implementationClass="java.util.Calendar" __index="4" __sourcePath="{}/Case_x005f_x005fc/LastModifiedDate" containerType="SINGLE" label="LastModifiedDate" name="LastModifiedDate" type="string"/>
+<Field __dmType="Calendar" __implementationClass="java.util.Calendar" __index="13" __sourcePath="{}/Case_x005f_x005fc/LastModifiedDate_x005f_x005fc" containerType="SINGLE" label="LastModifiedDate__c" name="LastModifiedDate__c" type="string"/>
 <Field __implementationClass="java.lang.String" __index="7" __sourcePath="{}/Case_x005f_x005fc/Name" containerType="SINGLE" label="Name" name="Name" type="string"/>
 <Field __implementationClass="java.lang.String" __index="8" __sourcePath="{}/Case_x005f_x005fc/Origin_x005f_x005fc" containerType="SINGLE" label="Origin__c" name="Origin__c" type="string"/>
 <Field __implementationClass="java.lang.String" __index="2" __sourcePath="{}/Case_x005f_x005fc/OwnerId" containerType="SINGLE" label="OwnerId" name="OwnerId" type="string"/>
@@ -68,83 +69,85 @@
 <Node enabled="enabled" fileURL="dict:inputPayload" guiName="Map&lt;k,v&gt; READER" guiX="20" guiY="20" id="BEAN_READER0" type="BEAN_READER">
 <attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Context outPort="0" sequenceField="__id" xpath=".">
-  <Mapping cloverField="AccountId" trim="true" xpath="AccountId"/>
-  <Mapping cloverField="AssetId" trim="true" xpath="AssetId"/>
-  <Mapping cloverField="CaseNumber" trim="true" xpath="CaseNumber"/>
-  <Mapping cloverField="ClosedDate" trim="true" xpath="ClosedDate"/>
-  <Mapping cloverField="ContactId" trim="true" xpath="ContactId"/>
+  <Mapping cloverField="Account__c" trim="true" xpath="Account_x005f_x005fc"/>
+  <Mapping cloverField="CaseId__c" trim="true" xpath="CaseId_x005f_x005fc"/>
+  <Mapping cloverField="Contact__c" trim="true" xpath="Contact_x005f_x005fc"/>
   <Mapping cloverField="CreatedById" trim="true" xpath="CreatedById"/>
   <Mapping cloverField="CreatedDate" trim="true" xpath="CreatedDate"/>
-  <Mapping cloverField="Description" trim="true" xpath="Description"/>
-  <Mapping cloverField="EngineeringReqNumber__c" trim="true" xpath="EngineeringReqNumber_x005f_x005fc"/>
-  <Mapping cloverField="ExtId__c" trim="true" xpath="ExtId_x005f_x005fc"/>
+  <Mapping cloverField="Description__c" trim="true" xpath="Description_x005f_x005fc"/>
   <Mapping cloverField="Id" trim="true" xpath="Id"/>
-  <Mapping cloverField="IsClosed" trim="true" xpath="IsClosed"/>
   <Mapping cloverField="IsDeleted" trim="true" xpath="IsDeleted"/>
-  <Mapping cloverField="IsEscalated" trim="true" xpath="IsEscalated"/>
   <Mapping cloverField="LastModifiedById" trim="true" xpath="LastModifiedById"/>
   <Mapping cloverField="LastModifiedDate" trim="true" xpath="LastModifiedDate"/>
-  <Mapping cloverField="Origin" trim="true" xpath="Origin"/>
+  <Mapping cloverField="LastModifiedDate__c" trim="true" xpath="LastModifiedDate_x005f_x005fc"/>
+  <Mapping cloverField="Name" trim="true" xpath="Name"/>
+  <Mapping cloverField="Origin__c" trim="true" xpath="Origin_x005f_x005fc"/>
   <Mapping cloverField="OwnerId" trim="true" xpath="OwnerId"/>
-  <Mapping cloverField="ParentId" trim="true" xpath="ParentId"/>
-  <Mapping cloverField="PotentialLiability__c" trim="true" xpath="PotentialLiability_x005f_x005fc"/>
-  <Mapping cloverField="Priority" trim="true" xpath="Priority"/>
-  <Mapping cloverField="Product__c" trim="true" xpath="Product_x005f_x005fc"/>
-  <Mapping cloverField="Reason" trim="true" xpath="Reason"/>
-  <Mapping cloverField="SLAViolation__c" trim="true" xpath="SLAViolation_x005f_x005fc"/>
-  <Mapping cloverField="Status" trim="true" xpath="Status"/>
-  <Mapping cloverField="Subject" trim="true" xpath="Subject"/>
-  <Mapping cloverField="SuppliedCompany" trim="true" xpath="SuppliedCompany"/>
-  <Mapping cloverField="SuppliedEmail" trim="true" xpath="SuppliedEmail"/>
-  <Mapping cloverField="SuppliedName" trim="true" xpath="SuppliedName"/>
-  <Mapping cloverField="SuppliedPhone" trim="true" xpath="SuppliedPhone"/>
+  <Mapping cloverField="Priority__c" trim="true" xpath="Priority_x005f_x005fc"/>
+  <Mapping cloverField="Status__c" trim="true" xpath="Status_x005f_x005fc"/>
+  <Mapping cloverField="Subject__c" trim="true" xpath="Subject_x005f_x005fc"/>
   <Mapping cloverField="SystemModstamp" trim="true" xpath="SystemModstamp"/>
-  <Mapping cloverField="Type" trim="true" xpath="Type"/>
 </Context>
 ]]></attr>
-<attr name="__typeName"><![CDATA[Case]]></attr>
-<attr name="_data_format"><![CDATA[MAP]]></attr>
-<attr name="__connectorName"><![CDATA[SalesforceA]]></attr>
-</Node>
-<Node enabled="enabled" guiName="Case to Custom Object" guiX="460" guiY="20" id="FOREACH_CASE_CASE_X005F_X005FC" transformClass="com.mulesoft.datamapper.transform.MelRecordTransform" type="REFORMAT">
-<attr name="melScript"><![CDATA[//MEL
-//START -> DO NOT REMOVE
-output.__id = input.__id;
-//END -> DO NOT REMOVE
-output.CaseId__c = input.Id;
-output.Status__c = input.Status;
-output.Subject__c = input.Subject;
-output.Priority__c = input.Priority;
-output.Description__c = input.Description;
-output.Origin__c = input.Origin;
-output.Id = input.ExtId__c;]]></attr>
-</Node>
-<Node cacheInMemory="true" enabled="enabled" fileURL="dict:outputPayload" guiName="Map&lt;k,v&gt; WRITER" guiX="900" guiY="20" id="MAP_WRITER0" type="MAP_WRITER">
-<attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
-<clover:element clover:name="Case__c" xmlns:clover="http://www.cloveretl.com/ns/xmlmapping" clover:inPort="0">
-  <clover:element clover:name="Account__c" clover:dataType="java.lang.String">$0.Account__c</clover:element>
-  <LastModifiedById clover:dataType="java.lang.String">$0.LastModifiedById</LastModifiedById>
-  <OwnerId clover:dataType="java.lang.String">$0.OwnerId</OwnerId>
-  <clover:element clover:name="Priority__c" clover:dataType="java.lang.String">$0.Priority__c</clover:element>
-  <LastModifiedDate clover:dataType="java.util.Calendar">$0.LastModifiedDate</LastModifiedDate>
-  <clover:element clover:name="Subject__c" clover:dataType="java.lang.String">$0.Subject__c</clover:element>
-  <clover:element clover:name="Contact__c" clover:dataType="java.lang.String">$0.Contact__c</clover:element>
-  <Name clover:dataType="java.lang.String">$0.Name</Name>
-  <clover:element clover:name="Origin__c" clover:dataType="java.lang.String">$0.Origin__c</clover:element>
-  <clover:element clover:name="CaseId__c" clover:dataType="java.lang.String">$0.CaseId__c</clover:element>
-  <SystemModstamp clover:dataType="java.util.Calendar">$0.SystemModstamp</SystemModstamp>
-  <CreatedById clover:dataType="java.lang.String">$0.CreatedById</CreatedById>
-  <CreatedDate clover:dataType="java.util.Calendar">$0.CreatedDate</CreatedDate>
-  <IsDeleted clover:dataType="java.lang.Boolean">$0.IsDeleted</IsDeleted>
-  <Id clover:dataType="java.lang.String">$0.Id</Id>
-  <clover:element clover:name="Description__c" clover:dataType="java.lang.String">$0.Description__c</clover:element>
-  <clover:element clover:name="Status__c" clover:dataType="java.lang.String">$0.Status__c</clover:element>
-</clover:element>]]></attr>
 <attr name="__typeName"><![CDATA[Case__c]]></attr>
 <attr name="_data_format"><![CDATA[MAP]]></attr>
 <attr name="__connectorName"><![CDATA[SalesforceB]]></attr>
 </Node>
-<Edge debugMode="true" fromNode="BEAN_READER0:0" guiBendpoints="" id="Edge0" inPort="Port 0 (in)" metadata="49eea395-59de-49d2-82c2-ba5e0464f634" outPort="Port 0 (out)" toNode="FOREACH_CASE_CASE_X005F_X005FC:0"/>
-<Edge debugMode="true" fromNode="FOREACH_CASE_CASE_X005F_X005FC:0" guiBendpoints="" id="Edge1" inPort="Port 0 (in)" metadata="1c98a743-96c4-49c3-877c-fb564dddff55" outPort="Port 0 (out)" toNode="MAP_WRITER0:0"/>
+<Node enabled="enabled" guiName="Custom Object to Case" guiX="460" guiY="20" id="FOREACH_CASE_X005F_X005FC_CASE" transformClass="com.mulesoft.datamapper.transform.MelRecordTransform" type="REFORMAT">
+<attr name="melScript"><![CDATA[//MEL
+//START -> DO NOT REMOVE
+output.__id = input.__id;
+//END -> DO NOT REMOVE
+
+output.Subject = input.Subject__c;
+output.Priority = input.Priority__c;
+output.Origin = input.Origin__c;
+output.Description = input.Description__c;
+output.ExtId__c = input.Id;
+output.Status = input.Status__c;
+output.Id = input.CaseId__c;]]></attr>
+</Node>
+<Node cacheInMemory="true" enabled="enabled" fileURL="dict:outputPayload" guiName="Map&lt;k,v&gt; WRITER" guiX="900" guiY="20" id="MAP_WRITER0" type="MAP_WRITER">
+<attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<Case xmlns:clover="http://www.cloveretl.com/ns/xmlmapping" clover:inPort="0">
+  <ParentId clover:dataType="java.lang.String">$0.ParentId</ParentId>
+  <clover:element clover:name="PotentialLiability__c">$0.PotentialLiability__c</clover:element>
+  <Type>$0.Type</Type>
+  <OwnerId clover:dataType="java.lang.String">$0.OwnerId</OwnerId>
+  <LastModifiedDate clover:dataType="java.util.Calendar">$0.LastModifiedDate</LastModifiedDate>
+  <SuppliedPhone clover:dataType="java.lang.String">$0.SuppliedPhone</SuppliedPhone>
+  <Origin>$0.Origin</Origin>
+  <clover:element clover:name="ExtId__c" clover:dataType="java.lang.String">$0.ExtId__c</clover:element>
+  <SuppliedName clover:dataType="java.lang.String">$0.SuppliedName</SuppliedName>
+  <IsEscalated clover:dataType="java.lang.Boolean">$0.IsEscalated</IsEscalated>
+  <IsClosed clover:dataType="java.lang.Boolean">$0.IsClosed</IsClosed>
+  <SystemModstamp clover:dataType="java.util.Calendar">$0.SystemModstamp</SystemModstamp>
+  <CaseNumber clover:dataType="java.lang.String">$0.CaseNumber</CaseNumber>
+  <Reason>$0.Reason</Reason>
+  <Description clover:dataType="java.lang.String">$0.Description</Description>
+  <LastModifiedById clover:dataType="java.lang.String">$0.LastModifiedById</LastModifiedById>
+  <Subject clover:dataType="java.lang.String">$0.Subject</Subject>
+  <ClosedDate clover:dataType="java.util.Calendar">$0.ClosedDate</ClosedDate>
+  <clover:element clover:name="SLAViolation__c">$0.SLAViolation__c</clover:element>
+  <Priority>$0.Priority</Priority>
+  <Status>$0.Status</Status>
+  <SuppliedEmail clover:dataType="java.lang.String">$0.SuppliedEmail</SuppliedEmail>
+  <AccountId clover:dataType="java.lang.String">$0.AccountId</AccountId>
+  <clover:element clover:name="Product__c">$0.Product__c</clover:element>
+  <CreatedById clover:dataType="java.lang.String">$0.CreatedById</CreatedById>
+  <CreatedDate clover:dataType="java.util.Calendar">$0.CreatedDate</CreatedDate>
+  <IsDeleted clover:dataType="java.lang.Boolean">$0.IsDeleted</IsDeleted>
+  <clover:element clover:name="EngineeringReqNumber__c" clover:dataType="java.lang.String">$0.EngineeringReqNumber__c</clover:element>
+  <ContactId clover:dataType="java.lang.String">$0.ContactId</ContactId>
+  <Id clover:dataType="java.lang.String">$0.Id</Id>
+  <SuppliedCompany clover:dataType="java.lang.String">$0.SuppliedCompany</SuppliedCompany>
+  <AssetId clover:dataType="java.lang.String">$0.AssetId</AssetId>
+</Case>]]></attr>
+<attr name="__typeName"><![CDATA[Case]]></attr>
+<attr name="_data_format"><![CDATA[MAP]]></attr>
+<attr name="__connectorName"><![CDATA[SalesforceA]]></attr>
+</Node>
+<Edge debugMode="true" fromNode="BEAN_READER0:0" guiBendpoints="" id="Edge0" inPort="Port 0 (in)" metadata="cf2d61c9-57b7-41f6-948d-2727e7d02dd0" outPort="Port 0 (out)" toNode="FOREACH_CASE_X005F_X005FC_CASE:0"/>
+<Edge debugMode="true" fromNode="FOREACH_CASE_X005F_X005FC_CASE:0" guiBendpoints="" id="Edge1" inPort="Port 0 (in)" metadata="e695bc0d-ab14-40ca-81f2-84a3ba1a78b0" outPort="Port 0 (out)" toNode="MAP_WRITER0:0"/>
 </Phase>
 </Graph>
