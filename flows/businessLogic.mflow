@@ -16,18 +16,30 @@
     </global-element>
     <flow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="container" SubFlow="false" type="http://www.mulesoft.org/schema/mule/batch/job" entity-id="Batch#1">
         <properties>
+            <property name="max-failed-records" value="0"/>
+            <property name="scheduling-strategy" value="ORDERED_SEQUENTIAL"/>
             <property name="name" value="batch"/>
-            <property name="max-failed-records"/>
-            <property name="scheduling-strategy"/>
             <property name="auxiliary;index" value="3"/>
-            <property-collection name="@http://www.mulesoft.org/schema/mule/batch/threading-profile;0">
+            <property name="updated"/>
+            <property-collection name="@http://www.mulesoft.org/schema/mule/batch/threading-profile;1500863293">
+                <property name="maxBufferSize" value=""/>
+                <property name="auxiliary;erased;threadWaitTimeout" value="true"/>
                 <property name="poolExhaustedAction" value="WAIT"/>
-                <property name="auxiliary;wrapIn" value="4"/>
+                <property name="auxiliary;erased;maxThreadsActive" value="true"/>
+                <property name="threadWaitTimeout" value=""/>
+                <property name="auxiliary;erased;maxBufferSize" value="true"/>
+                <property name="doThreading" value="true"/>
+                <property name="auxiliary;erased;threadTTL" value="true"/>
+                <property name="maxThreadsIdle" value=""/>
+                <property name="maxThreadsActive" value=""/>
+                <property name="threadTTL" value=""/>
                 <property name="auxiliary;index" value="4"/>
+                <property name="auxiliary;erased;maxThreadsIdle" value="true"/>
             </property-collection>
         </properties>
-        <lane xsi:type="nestedContainer" name="Input" type="http://www.mulesoft.org/schema/mule/batch/input" hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="b3279c67-db5d-4b53-9bbf-f3949725183b"/>
-        <lane xsi:type="nestedContainer" name="Process Records" type="http://www.mulesoft.org/schema/mule/batch/process-records" hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="6135492f-166b-462b-97ed-9f5bdeaabf88">
+        <description></description>
+        <lane xsi:type="nestedContainer" name="Input" type="http://www.mulesoft.org/schema/mule/batch/input" hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="b40c46dd-9203-446e-b548-ec25f491d45d"/>
+        <lane xsi:type="nestedContainer" name="Process Records" type="http://www.mulesoft.org/schema/mule/batch/process-records" hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="c264d170-a517-4f1e-9bab-b0a5ebc3ccbd">
             <scope type="http://www.mulesoft.org/schema/mule/batch/step" entity-id="Batch Step#1">
                 <properties>
                     <property name="filter-expression" value="#['B'.equals(flowVars['sourceSystem']) || payload['ExtId__c'] == null]"/>
@@ -35,6 +47,7 @@
                     <property name="accept-policy"/>
                     <property name="auxiliary;index" value="6"/>
                 </properties>
+                <description></description>
                 <compartment entity-id="compartment#1">
                     <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#1">
                         <scope name="store Case" type="org.mule.tooling.ui.modules.core.scope.enricher" entity-id="Message Enricher#1">
@@ -44,9 +57,10 @@
 <property name="target" value="#[recordVars['caseInTargetInstance']]"/>
 <property name="auxiliary;index" value="7"/>
                             </properties>
+                            <description></description>
                             <compartment entity-id="compartment#2">
 <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#2">
-    <pattern name="query Custom Object Case from B" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#1">
+    <pattern name="query Case CustomObject  from B" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#1">
         <graphicalData x="0" y="0" width="0" height="0"/>
         <properties>
             <property name=""/>
@@ -66,6 +80,7 @@
             <property name="proxyPassword"/>
             <property name="auxiliary;index" value="8"/>
         </properties>
+        <description></description>
     </pattern>
 </lane>
                             </compartment>
@@ -73,11 +88,13 @@
                         <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#1">
                             <graphicalData x="0" y="0" width="0" height="0"/>
                             <properties>
-<property name="message" value="AAAAA  RECORD #[payload]  + RECORDVARS  #[recordVars['caseInTargetInstance']]"/>
-<property name="category"/>
+<property name="message" value="AAAAA  PAYLOAD #[payload]  + FLOWVARS #[flowVars['sourceSystem']] + RECORDVARS  recordVars['caseInTargetInstance']  : #[recordVars['caseInTargetInstance']]  #[recordVars['caseInTargetInstance'] == null]"/>
+<property name="category" value=""/>
 <property name="level" value="INFO"/>
+<property name="updated"/>
 <property name="auxiliary;index" value="9"/>
                             </properties>
+                            <description></description>
                         </pattern>
                     </lane>
                 </compartment>
@@ -89,6 +106,7 @@
                     <property name="accept-policy"/>
                     <property name="auxiliary;index" value="10"/>
                 </properties>
+                <description></description>
                 <compartment entity-id="compartment#3">
                     <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#3">
                         <scope name="store Case" type="org.mule.tooling.ui.modules.core.scope.enricher" entity-id="Message Enricher#2">
@@ -98,9 +116,10 @@
 <property name="target" value="#[recordVars['caseInTargetInstance']]"/>
 <property name="auxiliary;index" value="11"/>
                             </properties>
+                            <description></description>
                             <compartment entity-id="compartment#4">
 <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#4">
-    <pattern name="query Case from A" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#2">
+    <pattern name="query Case Object from instance A" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#2">
         <graphicalData x="0" y="0" width="0" height="0"/>
         <properties>
             <property name=""/>
@@ -120,6 +139,7 @@
             <property name="proxyPassword"/>
             <property name="auxiliary;index" value="12"/>
         </properties>
+        <description></description>
     </pattern>
 </lane>
                             </compartment>
@@ -127,60 +147,34 @@
                         <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#2">
                             <graphicalData x="0" y="0" width="0" height="0"/>
                             <properties>
-<property name="message" value="BBBBB  RECORD #[payload]  + RECORDVARS  #[recordVars['caseInTargetInstance']]"/>
+<property name="message" value="BBBBB  RECORD #[payload]  + RECORDVARS  recordVars['caseInTargetInstance']  : #[recordVars['caseInTargetInstance']]  #[recordVars['caseInTargetInstance'] == null]"/>
 <property name="category"/>
 <property name="level" value="INFO"/>
 <property name="auxiliary;index" value="13"/>
                             </properties>
+                            <description></description>
                         </pattern>
                     </lane>
                 </compartment>
             </scope>
             <scope type="http://www.mulesoft.org/schema/mule/batch/step" entity-id="Batch Step#3">
                 <properties>
-                    <property name="filter-expression" value="#['B'.equals(flowVars['sourceSystem'])]"/>
+                    <property name="filter-expression" value="#[('B'.equals(flowVars['sourceSystem'])) || (recordVars['caseInTargetInstance'] is NullPayload ? false : (recordVars['caseInTargetInstance'].get('LastModifiedDate') &gt;= payload.get('LastModifiedDate')) || !('${sfdc.a.integration.user.id}' == payload.get('LastModifiedById')))]"/>
+                    <property name="updated"/>
                     <property name="name" value="upsertCaseInBStep"/>
-                    <property name="accept-policy"/>
+                    <property name="accept-policy" value="NO_FAILURES"/>
                     <property name="auxiliary;index" value="14"/>
                 </properties>
+                <description></description>
                 <compartment entity-id="compartment#5">
                     <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#5">
-                        <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#3">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
-                            <properties>
-<property name="message" value="AAAAA  recordVar date :     #[ recordVars['caseInTargetInstance']] #[ (recordVars['caseInTargetInstance'] == null ? &quot;not defined&quot; :  recordVars['caseInTargetInstance'].get('LastModifiedDate') +&quot; compare with payload &quot;+ payload.get('LastModifiedDate')) ]"/>
-<property name="category"/>
-<property name="level" value="INFO"/>
-<property name="auxiliary;index" value="15"/>
-                            </properties>
-                        </pattern>
-                        <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#4">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
-                            <properties>
-<property name="message" value="AAAAA integration user prop #[ '${sfdc.a.integration.user.id}']   payload #[payload.get('LastModifiedById')]"/>
-<property name="category"/>
-<property name="level" value="INFO"/>
-<property name="auxiliary;index" value="16"/>
-                            </properties>
-                            <description></description>
-                        </pattern>
-                        <pattern name="Expression" type="org.mule.tooling.ui.modules.core.filter.Expression" entity-id="Expression#1">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
-                            <properties>
-<property name="expression" value="#[ recordVars['caseInTargetInstance'].get('LastModifiedDate') &gt; payload.get('LastModifiedDate') || '${sfdc.a.integration.user.id}'.equals(payload.get('LastModifiedById')) ]"/>
-<property name="updated"/>
-<property name="auxiliary;index" value="17"/>
-<property name="nullReturnsTrue" value="false"/>
-                            </properties>
-                            <description></description>
-                        </pattern>
-                        <pattern name="prepare case for upsert" type="http://www.mulesoft.org/schema/mule/core/expression-component" entity-id="Expression#2">
+                        <pattern name="prepare case for upsert" type="http://www.mulesoft.org/schema/mule/core/expression-component" entity-id="Expression#1">
                             <graphicalData x="0" y="0" width="0" height="0"/>
                             <properties>
 <property name="expression" value="payload.remove('LastModifiedById');&#xA;payload.remove('LastModifiedDate');&#xA;payload.remove('ContactId');&#xA;payload.remove('AccountId');&#xA;//payload.remove('Id');&#xA;"/>
 <property name="file"/>
 <property name="evaluator"/>
-<property name="auxiliary;index" value="18"/>
+<property name="auxiliary;index" value="15"/>
                             </properties>
                             <description></description>
                         </pattern>
@@ -194,28 +188,28 @@
 <property name="target"/>
 <property name="config-ref" value="case_to_customobject"/>
 <property name="pipeSize"/>
-<property name="auxiliary;index" value="19"/>
+<property name="auxiliary;index" value="16"/>
                             </properties>
                         </pattern>
-                        <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#5">
+                        <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#3">
                             <graphicalData x="0" y="0" width="0" height="0"/>
                             <properties>
 <property name="message" value="AAAAA to upsert #[payload]"/>
 <property name="category"/>
 <property name="level" value="INFO"/>
-<property name="auxiliary;index" value="20"/>
+<property name="auxiliary;index" value="17"/>
                             </properties>
                         </pattern>
                         <scope name="Batch Commit" type="http://www.mulesoft.org/schema/mule/batch/commit" entity-id="Batch Commit#1">
                             <graphicalData x="0" y="0" width="0" height="0"/>
                             <properties>
 <property name="streaming"/>
-<property name="auxiliary;index" value="21"/>
+<property name="auxiliary;index" value="18"/>
 <property name="size" value="100"/>
                             </properties>
                             <compartment entity-id="compartment#6">
 <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#6">
-    <pattern name="Upsert Custom Object B" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#3">
+    <pattern name="Upsert Case CustomObject in instance B" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#3">
         <graphicalData x="0" y="0" width="0" height="0"/>
         <properties>
             <property name=""/>
@@ -234,21 +228,22 @@
             <property name="accessTokenId"/>
             <property name="config-ref" value="SalesforceB"/>
             <property name="proxyPassword"/>
-            <property name="auxiliary;index" value="22"/>
+            <property name="auxiliary;index" value="19"/>
             <property-collection name="@http://www.mulesoft.org/schema/mule/sfdc/upsert-objectss;0">
                 <property name="ref" value="#[payload]"/>
-                <property name="auxiliary;wrapIn" value="23"/>
-                <property name="auxiliary;index" value="23"/>
+                <property name="auxiliary;wrapIn" value="20"/>
+                <property name="auxiliary;index" value="20"/>
             </property-collection>
         </properties>
+        <description></description>
     </pattern>
-    <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#6">
+    <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#4">
         <graphicalData x="0" y="0" width="0" height="0"/>
         <properties>
             <property name="message" value="AAAAA upsert result to B #[payload]"/>
             <property name="category"/>
             <property name="level" value="INFO"/>
-            <property name="auxiliary;index" value="24"/>
+            <property name="auxiliary;index" value="21"/>
         </properties>
     </pattern>
 </lane>
@@ -259,48 +254,22 @@
             </scope>
             <scope type="http://www.mulesoft.org/schema/mule/batch/step" entity-id="Batch Step#4">
                 <properties>
-                    <property name="filter-expression" value="#['A'.equals(flowVars['sourceSystem'])]"/>
+                    <property name="filter-expression" value="#[('A'.equals(flowVars['sourceSystem'])) || (recordVars['caseInTargetInstance'] is NullPayload ? false : (recordVars['caseInTargetInstance'].get('LastModifiedDate') &gt;= payload.get('LastModifiedDate')) || !('${sfdc.b.integration.user.id}' == payload.get('LastModifiedById')))]"/>
+                    <property name="updated"/>
                     <property name="name" value="upsertCaseInAStep"/>
-                    <property name="accept-policy"/>
-                    <property name="auxiliary;index" value="25"/>
+                    <property name="accept-policy" value="NO_FAILURES"/>
+                    <property name="auxiliary;index" value="22"/>
                 </properties>
+                <description></description>
                 <compartment entity-id="compartment#7">
                     <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#7">
-                        <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#7">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
-                            <properties>
-<property name="message" value="BBBBB recordVar date :  #[ recordVars['caseInTargetInstance']]   #[ (recordVars['caseInTargetInstance'] == null ? &quot;not defined&quot; :  recordVars['caseInTargetInstance'].get('LastModifiedDate') +&quot; compare with payload &quot;+ payload.get('LastModifiedDate')) ]"/>
-<property name="category"/>
-<property name="level" value="INFO"/>
-<property name="auxiliary;index" value="26"/>
-                            </properties>
-                        </pattern>
-                        <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#8">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
-                            <properties>
-<property name="message" value="BBBBB integration user prop #[ '${sfdc.b.integration.user.id}']   payload #[payload.get('LastModifiedById')]"/>
-<property name="category"/>
-<property name="level" value="INFO"/>
-<property name="auxiliary;index" value="27"/>
-                            </properties>
-                        </pattern>
-                        <pattern name="Expression" type="org.mule.tooling.ui.modules.core.filter.Expression" entity-id="Expression#3">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
-                            <properties>
-<property name="expression" value="#[ recordVars['caseInTargetInstance'].get('LastModifiedDate') &gt; payload.get('LastModifiedDate') || '${sfdc.b.integration.user.id}'.equals(payload.get('LastModifiedById')) ]"/>
-<property name="updated"/>
-<property name="auxiliary;index" value="28"/>
-<property name="nullReturnsTrue" value="false"/>
-                            </properties>
-                            <description></description>
-                        </pattern>
-                        <pattern name="prepare case for upsert" type="http://www.mulesoft.org/schema/mule/core/expression-component" entity-id="Expression#4">
+                        <pattern name="prepare case for upsert" type="http://www.mulesoft.org/schema/mule/core/expression-component" entity-id="Expression#2">
                             <graphicalData x="0" y="0" width="0" height="0"/>
                             <properties>
 <property name="expression" value="payload.remove('LastModifiedById');&#xA;payload.remove('LastModifiedDate');&#xA;//payload.remove('ContactId');&#xA;//payload.remove('AccountId');&#xA;//payload.remove('Id');&#xA;"/>
 <property name="file"/>
 <property name="evaluator"/>
-<property name="auxiliary;index" value="29"/>
+<property name="auxiliary;index" value="23"/>
                             </properties>
                             <description></description>
                         </pattern>
@@ -314,28 +283,28 @@
 <property name="target"/>
 <property name="config-ref" value="customobject_to_case"/>
 <property name="pipeSize"/>
-<property name="auxiliary;index" value="30"/>
+<property name="auxiliary;index" value="24"/>
                             </properties>
                         </pattern>
                         <scope name="Batch Commit" type="http://www.mulesoft.org/schema/mule/batch/commit" entity-id="Batch Commit#2">
                             <graphicalData x="0" y="0" width="0" height="0"/>
                             <properties>
 <property name="streaming"/>
-<property name="auxiliary;index" value="31"/>
+<property name="auxiliary;index" value="25"/>
 <property name="size" value="100"/>
                             </properties>
                             <compartment entity-id="compartment#8">
 <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#8">
-    <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#9">
+    <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#5">
         <graphicalData x="0" y="0" width="0" height="0"/>
         <properties>
             <property name="message" value="BBBBB to upsert #[payload]"/>
             <property name="category"/>
             <property name="level" value="INFO"/>
-            <property name="auxiliary;index" value="32"/>
+            <property name="auxiliary;index" value="26"/>
         </properties>
     </pattern>
-    <pattern name="Upsert Case A" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#4">
+    <pattern name="Upsert Case in instance A" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#4">
         <graphicalData x="0" y="0" width="0" height="0"/>
         <properties>
             <property name=""/>
@@ -354,21 +323,22 @@
             <property name="accessTokenId"/>
             <property name="config-ref" value="SalesforceA"/>
             <property name="proxyPassword"/>
-            <property name="auxiliary;index" value="33"/>
+            <property name="auxiliary;index" value="27"/>
             <property-collection name="@http://www.mulesoft.org/schema/mule/sfdc/upsert-objectss;0">
                 <property name="ref" value="#[payload]"/>
-                <property name="auxiliary;wrapIn" value="34"/>
-                <property name="auxiliary;index" value="34"/>
+                <property name="auxiliary;wrapIn" value="28"/>
+                <property name="auxiliary;index" value="28"/>
             </property-collection>
         </properties>
+        <description></description>
     </pattern>
-    <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#10">
+    <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#6">
         <graphicalData x="0" y="0" width="0" height="0"/>
         <properties>
             <property name="message" value="BBBBB upsert result to A #[payload]"/>
             <property name="category"/>
             <property name="level" value="INFO"/>
-            <property name="auxiliary;index" value="35"/>
+            <property name="auxiliary;index" value="29"/>
         </properties>
     </pattern>
 </lane>
@@ -381,7 +351,7 @@
                 <property name="auxiliary;index" value="5"/>
             </properties>
         </lane>
-        <lane xsi:type="nestedContainer" name="On Complete" type="http://www.mulesoft.org/schema/mule/batch/on-complete" hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="c7f5b7f1-61c4-4758-8890-5b9048588c3c"/>
+        <lane xsi:type="nestedContainer" name="On Complete" type="http://www.mulesoft.org/schema/mule/batch/on-complete" hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="88a68ded-2906-4982-b3bc-9df99f92672f"/>
         <containerBehavior>default</containerBehavior>
     </flow>
     <description></description>
