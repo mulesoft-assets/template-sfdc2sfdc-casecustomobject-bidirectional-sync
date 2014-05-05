@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="endpoints">
-    <flow SubFlow="false" name="triggerSyncFromAFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="1bd84d39-623c-4b83-b853-dc9b86e3ca0b">
+    <flow SubFlow="false" name="triggerSyncFromAFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="c3aaed46-d607-44cc-abf5-d80973f7d6aa">
         <properties>
             <property name="initialState"/>
             <property name="processingStrategy2" value="synchronous"/>
@@ -42,20 +42,20 @@
 <property name="fetchSize" value=""/>
 <property name="securityToken" value=""/>
 <property name="proxyHost" value=""/>
-<property name="query" value="dsql:SELECT Id,AccountId,ContactId,Description,Subject,LastModifiedDate,LastModifiedById,Origin,Priority,Status, ExtId__c &#xA;FROM Case&#xA;WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateA']] ORDER BY LastModifiedDate ASC LIMIT 200"/>
+<property name="query" value="dsql:SELECT Id,AccountId,ContactId,Description,Subject,LastModifiedDate,LastModifiedById,Origin,Priority,Status, ExtId__c, Account.Name, Contact.Name, Contact.Email &#xA;FROM Case&#xA;WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateA']] ORDER BY LastModifiedDate ASC LIMIT 200"/>
 <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/sfdc/query"/>
 <property name="proxyPort" value="80"/>
 <property name="password" value=""/>
 <property name="url" value=""/>
 <property name="auxiliary;metaqueryAttributeName" value="query"/>
 <property name="username" value=""/>
-<property name="updated"/>
 <property name="sessionId" value=""/>
+<property name="updated"/>
 <property name="serviceEndpoint" value=""/>
 <property name="accessTokenId" value=""/>
 <property name="config-ref" value="SalesforceA"/>
-<property name="auxiliary;index" value="5"/>
 <property name="proxyPassword" value=""/>
+<property name="auxiliary;index" value="5"/>
 <property name="auxiliary;metametadataStrategy" value="dsql-metadata-strategy"/>
                             </properties>
                             <description></description>
@@ -84,15 +84,13 @@
             <pattern name="Batch Execute" type="http://www.mulesoft.org/schema/mule/batch/execute" entity-id="Batch Execute#1">
                 <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
-                    <property name="updated"/>
                     <property name="name" value="batch"/>
                     <property name="auxiliary;index" value="8"/>
                 </properties>
-                <description></description>
             </pattern>
         </lane>
     </flow>
-    <flow SubFlow="false" name="triggerSyncFromBFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="58838417-dc56-42c6-8651-3d56c6f0a1ec">
+    <flow SubFlow="false" name="triggerSyncFromBFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="3cf4246c-eaf5-463a-bec0-e186f66bf5a0">
         <properties>
             <property name="initialState"/>
             <property name="processingStrategy2" value="synchronous"/>
@@ -134,7 +132,7 @@
 <property name="fetchSize" value=""/>
 <property name="securityToken" value=""/>
 <property name="proxyHost" value=""/>
-<property name="query" value="dsql:SELECT Id,Account__c,Contact__c,Description__c,Subject__c,LastModifiedDate,LastModifiedById,Origin__c,Priority__c,Status__c, CaseId__c&#xA;FROM Case__c&#xA;WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateB']] ORDER BY LastModifiedDate ASC LIMIT 200"/>
+<property name="query" value="dsql:SELECT Id,Account__c,Contact__c,Description__c,Subject__c,LastModifiedDate,LastModifiedById,Origin__c,Priority__c,Status__c, CaseId__c, Account__r.Name, Account__r.Id, Contact__r.Name, Contact__r.Email&#xA;FROM Case__c&#xA;WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateB']] ORDER BY LastModifiedDate ASC LIMIT 200"/>
 <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/sfdc/query"/>
 <property name="proxyPort" value="80"/>
 <property name="password" value=""/>
@@ -176,11 +174,9 @@
             <pattern name="Batch Execute" type="http://www.mulesoft.org/schema/mule/batch/execute" entity-id="Batch Execute#2">
                 <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
-                    <property name="updated"/>
                     <property name="name" value="batch"/>
                     <property name="auxiliary;index" value="16"/>
                 </properties>
-                <description></description>
             </pattern>
         </lane>
     </flow>
