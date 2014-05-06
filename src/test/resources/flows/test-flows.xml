@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" 
+xmlns:json="http://www.mulesoft.org/schema/mule/json" 
+xmlns="http://www.mulesoft.org/schema/mule/core" 
+xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+xmlns:spring="http://www.springframework.org/schema/beans" 
+version="EE-3.5.0" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+    <sub-flow name="createCaseInAFlow" doc:name="createCaseInAFlow">
+        <sfdc:create config-ref="SalesforceA" type="Lead" doc:name="Salesforce">
+            <sfdc:objects ref="#[payload]"/>
+        </sfdc:create>
+    </sub-flow>
+        <sub-flow name="createCaseInBFlowaaa" doc:name="createCaseInBFlow">
+        <sfdc:create config-ref="SalesforceB" type="Lead" doc:name="Salesforce">
+            <sfdc:objects ref="#[payload]"/>
+        </sfdc:create>
+    </sub-flow>
+    <sub-flow name="deleteCase__cFromAFlow" doc:name="deleteCase__cFromAFlow">
+        <sfdc:delete config-ref="SalesforceA" doc:name="Salesforce">
+            <sfdc:ids ref="#[payload]"/>
+        </sfdc:delete>
+    </sub-flow>
+    <sub-flow name="deleteCase__cFromBFlow" doc:name="deleteCase__cFromBFlow">
+        <sfdc:delete config-ref="SalesforceB" doc:name="Salesforce">
+            <sfdc:ids ref="#[payload]"/>
+        </sfdc:delete>
+    </sub-flow>
+    
+
+</mule>

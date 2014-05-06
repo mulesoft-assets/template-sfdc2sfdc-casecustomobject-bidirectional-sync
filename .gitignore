@@ -43,8 +43,6 @@ local.properties
 # Studio-specific #
 # --------------- #
 .studio/
-flows/
 target/
-**/*.mflow
 /bin
 

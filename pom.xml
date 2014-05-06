@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.mulesoft</groupId>
+	<groupId>org.mule.templates</groupId>
 	<artifactId>template-sfdc2sfdc-case2custom-bidirectional-sync</artifactId>
 	<packaging>mule</packaging>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
+	<name>SFDC2SFDC-Case2CustomObject Mule Template Project</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
 		<mule.version>3.5.0-M4</mule.version>
+		<sfdc.version>5.4.3</sfdc.version>
 		<eclipsePluginVersion>2.8</eclipsePluginVersion>
 		<jdkName>JavaSE-1.6</jdkName>
 		<jdk.version>1.6</jdk.version>
@@ -50,7 +52,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore/>
+										<ignore />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -60,6 +62,27 @@
 			</plugins>
 		</pluginManagement>
 		<plugins>
+			<!-- Integration Tests -->
+			<plugin>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<useFile>false</useFile>
+					<additionalClasspathElements>
+						<additionalClasspathElement>${MULE_HOME}/conf/</additionalClasspathElement>
+						<!-- Location of the mule licence in Bamboo muleLicenseKey.lic -->
+						<additionalClasspathElement>/home/j2ee-bamboo/license</additionalClasspathElement>
+					</additionalClasspathElements>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.mule.tools</groupId>
 				<artifactId>maven-mule-plugin</artifactId>
@@ -67,13 +90,17 @@
 				<extensions>true</extensions>
 				<configuration>
 					<copyToAppsDirectory>true</copyToAppsDirectory>
-				<inclusions>
-                        <inclusion>
-                            <groupId>org.mule.modules</groupId>
-                            <artifactId>mule-module-sfdc</artifactId>
-                        </inclusion>
-                    </inclusions>
-                </configuration>
+					<inclusions>
+						<inclusion>
+							<groupId>org.mule.modules</groupId>
+							<artifactId>mule-module-sfdc</artifactId>
+						</inclusion>
+						<inclusion>
+							<groupId>org.mule.modules</groupId>
+							<artifactId>mule-module-json</artifactId>
+						</inclusion>
+					</inclusions>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -114,89 +141,87 @@
 						<goals>
 							<goal>add-resource</goal>
 						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>src/main/app/</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>java</goal>
+						</goals>
 					</execution>
 				</executions>
 				<configuration>
-					<resources>
-						<resource>
-							<directory>src/main/app/</directory>
-						</resource>
-					<resource>
-                            <directory>src/main/api/</directory>
-                        </resource>
-                    </resources>
+					<mainClass>org.mule.MuleServer</mainClass>
+					<arguments>
+						<argument>-config</argument>
+						<argument>src/main/app/mule-config.xml</argument>
+					</arguments>
+					<classpathScope>compile</classpathScope>
 				</configuration>
 			</plugin>
-			<plugin>
-		        <groupId>org.codehaus.mojo</groupId>
-		        <artifactId>exec-maven-plugin</artifactId>
-		        <version>1.2.1</version>
-		        <executions>
-		          <execution>
-		            <goals>
-		              <goal>java</goal>
-		            </goals>
-		          </execution>
-		        </executions>
-		        <configuration>
-		          <mainClass>org.mule.MuleServer</mainClass>
-		          <arguments>
-		            <argument>-config</argument>
-					<argument>src/main/app/mule-config.xml</argument>
-		          </arguments>
-		        <classpathScope>compile</classpathScope>
-		        </configuration>
-		      </plugin>
-		      
-		      <!--Install clover-plugins-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.4</version>
-                <executions>
-                    <execution>
-                        <id>copy-clover-plugins</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                            <stripVersion>true</stripVersion>
 
-                            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.cloveretl</groupId>
-                                    <artifactId>cloveretl-engine</artifactId>
-                                    <version>${mule.version}</version>
-                                    <type>zip</type>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <configuration>
-                            <tasks>
-                                <!-- Using an ant task to deflate cloveretl-engine.zip -->
-                                <unzip dest="${project.build.testOutputDirectory}" src="${project.build.testOutputDirectory}/cloveretl-engine.zip"/>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+			<!--Install clover-plugins -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<id>copy-clover-plugins</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+							<stripVersion>true</stripVersion>
+
+							<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+							<artifactItems>
+								<artifactItem>
+									<groupId>com.cloveretl</groupId>
+									<artifactId>cloveretl-engine</artifactId>
+									<version>${mule.version}</version>
+									<type>zip</type>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<configuration>
+							<tasks>
+								<!-- Using an ant task to deflate cloveretl-engine.zip -->
+								<unzip dest="${project.build.testOutputDirectory}"
+									src="${project.build.testOutputDirectory}/cloveretl-engine.zip" />
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -386,6 +411,13 @@
 		</dependency>
 		<!-- for testing -->
 		<dependency>
+			<groupId>com.mulesoft.muleesb.modules</groupId>
+			<artifactId>mule-module-batch-ee</artifactId>
+			<version>${mule.version}</version>
+			<scope>test</scope>
+			<type>test-jar</type>
+		</dependency>			
+		<dependency>
 			<groupId>org.mule.tests</groupId>
 			<artifactId>mule-tests-functional</artifactId>
 			<version>${mule.version}</version>
@@ -417,35 +449,41 @@
     </dependencies>
 
 	<repositories>
-          <repository>
-            <id>Central</id>
-            <name>Central</name>
-            <url>http://repo1.maven.org/maven2/</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
-            <id>mulesoft-releases</id>
-            <name>MuleSoft Releases Repository</name>
-            <url>http://repository.mulesoft.org/releases/</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
-            <id>mulesoft-snapshots</id>
-            <name>MuleSoft Snapshots Repository</name>
-            <url>http://repository.mulesoft.org/snapshots/</url>
-            <layout>default</layout>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>mulesoft-release</id>
-            <name>mulesoft release repository</name>
-            <layout>default</layout>
-            <url>http://repository.mulesoft.org/releases/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
+		<repository>
+			<id>jboss</id>
+			<name>JBoss</name>
+			<url>http://repository.jboss.com/</url>
+		</repository>
+		<repository>
+			<id>mulesoft-releases</id>
+			<name>MuleSoft Releases</name>
+			<url>http://repository.mulesoft.org/releases/</url>
+		</repository>
+		<repository>
+			<id>oss-sonatype-snapshots</id>
+			<url>http://oss.sonatype.org/content/repositories/snapshots/</url>
+		</repository>
+		<repository>
+			<id>codehaus-snaphosts</id>
+			<name>Codehaus Snapshots</name>
+			<url>http://snapshots.repository.codehaus.org/</url>
+		</repository>
+		<repository>
+			<id>codehaus-releases</id>
+			<name>CodeHaus Releases</name>
+			<url>http://repository.codehaus.org/</url>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>mulesoft-release</id>
+			<name>mulesoft release repository</name>
+			<layout>default</layout>
+			<url>http://repository.mulesoft.org/releases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 
 </project>

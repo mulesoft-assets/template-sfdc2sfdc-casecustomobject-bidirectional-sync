@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="test-flows">
+    <flow SubFlow="true" name="createCaseInAFlow" type="http://www.mulesoft.org/schema/mule/core/subflow" entity-id="a9344e11-fe89-498a-bf9f-1e8722e4b007">
+        <properties>
+            <property name="initialState"/>
+            <property name="processingStrategy2"/>
+            <property name="processingStrategy"/>
+            <property name="bussinessEventsLabel"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="auxiliary;index" value="1"/>
+        </properties>
+        <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#1">
+            <graphicalData x="0" y="0" width="0" height="0"/>
+            <pattern name="Salesforce" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#1">
+                <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name=""/>
+                    <property name="proxyUsername"/>
+                    <property name="securityToken"/>
+                    <property name="proxyHost"/>
+                    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/sfdc/create"/>
+                    <property name="proxyPort"/>
+                    <property name="type" value="Lead"/>
+                    <property name="password"/>
+                    <property name="url"/>
+                    <property name="username"/>
+                    <property name="sessionId"/>
+                    <property name="serviceEndpoint"/>
+                    <property name="accessTokenId"/>
+                    <property name="config-ref" value="SalesforceA"/>
+                    <property name="auxiliary;index" value="2"/>
+                    <property name="proxyPassword"/>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/sfdc/create-objectss;0">
+                        <property name="ref" value="#[payload]"/>
+                        <property name="auxiliary;index" value="3"/>
+                        <property name="auxiliary;wrapIn" value="3"/>
+                    </property-collection>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+    <flow SubFlow="true" name="createCaseInBFlowaaa" type="http://www.mulesoft.org/schema/mule/core/subflow" entity-id="fb064d26-9a72-44a8-b754-2f848fdc20f2">
+        <properties>
+            <property name="initialState"/>
+            <property name="processingStrategy2"/>
+            <property name="processingStrategy"/>
+            <property name="bussinessEventsLabel"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="auxiliary;index" value="4"/>
+        </properties>
+        <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#2">
+            <graphicalData x="0" y="0" width="0" height="0"/>
+            <pattern name="Salesforce" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#2">
+                <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name=""/>
+                    <property name="proxyUsername"/>
+                    <property name="securityToken"/>
+                    <property name="proxyHost"/>
+                    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/sfdc/create"/>
+                    <property name="proxyPort"/>
+                    <property name="type" value="Lead"/>
+                    <property name="password"/>
+                    <property name="url"/>
+                    <property name="username"/>
+                    <property name="sessionId"/>
+                    <property name="serviceEndpoint"/>
+                    <property name="accessTokenId"/>
+                    <property name="config-ref" value="SalesforceB"/>
+                    <property name="auxiliary;index" value="5"/>
+                    <property name="proxyPassword"/>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/sfdc/create-objectss;0">
+                        <property name="ref" value="#[payload]"/>
+                        <property name="auxiliary;index" value="6"/>
+                        <property name="auxiliary;wrapIn" value="6"/>
+                    </property-collection>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+    <flow SubFlow="true" name="deleteCase__cFromAFlow" type="http://www.mulesoft.org/schema/mule/core/subflow" entity-id="067afbbd-0c8b-4c61-af99-1b0122252da3">
+        <properties>
+            <property name="initialState"/>
+            <property name="processingStrategy2"/>
+            <property name="processingStrategy"/>
+            <property name="bussinessEventsLabel"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="auxiliary;index" value="7"/>
+        </properties>
+        <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#3">
+            <graphicalData x="0" y="0" width="0" height="0"/>
+            <pattern name="Salesforce" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#3">
+                <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name=""/>
+                    <property name="proxyUsername"/>
+                    <property name="securityToken"/>
+                    <property name="proxyHost"/>
+                    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/sfdc/delete"/>
+                    <property name="proxyPort"/>
+                    <property name="password"/>
+                    <property name="url"/>
+                    <property name="username"/>
+                    <property name="sessionId"/>
+                    <property name="serviceEndpoint"/>
+                    <property name="accessTokenId"/>
+                    <property name="config-ref" value="SalesforceA"/>
+                    <property name="auxiliary;index" value="8"/>
+                    <property name="proxyPassword"/>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/sfdc/delete-idss;0">
+                        <property name="ref" value="#[payload]"/>
+                        <property name="auxiliary;index" value="9"/>
+                        <property name="auxiliary;wrapIn" value="9"/>
+                    </property-collection>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+    <flow SubFlow="true" name="deleteCase__cFromBFlow" type="http://www.mulesoft.org/schema/mule/core/subflow" entity-id="ab9f4fe6-6ed0-4db8-8abb-58411f0b8271">
+        <properties>
+            <property name="initialState"/>
+            <property name="processingStrategy2"/>
+            <property name="processingStrategy"/>
+            <property name="bussinessEventsLabel"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="auxiliary;index" value="10"/>
+        </properties>
+        <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#4">
+            <graphicalData x="0" y="0" width="0" height="0"/>
+            <pattern name="Salesforce" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#4">
+                <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name=""/>
+                    <property name="proxyUsername"/>
+                    <property name="securityToken"/>
+                    <property name="proxyHost"/>
+                    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/sfdc/delete"/>
+                    <property name="proxyPort"/>
+                    <property name="password"/>
+                    <property name="url"/>
+                    <property name="username"/>
+                    <property name="sessionId"/>
+                    <property name="serviceEndpoint"/>
+                    <property name="accessTokenId"/>
+                    <property name="config-ref" value="SalesforceB"/>
+                    <property name="auxiliary;index" value="11"/>
+                    <property name="proxyPassword"/>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/sfdc/delete-idss;0">
+                        <property name="ref" value="#[payload]"/>
+                        <property name="auxiliary;index" value="12"/>
+                        <property name="auxiliary;wrapIn" value="12"/>
+                    </property-collection>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+</mule-configuration>
