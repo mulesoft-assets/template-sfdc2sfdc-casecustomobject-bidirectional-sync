@@ -118,7 +118,8 @@ output.Priority__c = input.Priority;
 output.Description__c = input.Description;
 output.Origin__c = input.Origin;
 output.Id = input.ExtId__c;
-output.Account__c = input.AccountId;]]></attr>
+output.Account__c = input.AccountId;
+output.Contact__c = input.ContactId;]]></attr>
 </Node>
 <Node cacheInMemory="true" enabled="enabled" fileURL="dict:outputPayload" guiName="Map&lt;k,v&gt; WRITER" guiX="900" guiY="20" id="MAP_WRITER0" type="MAP_WRITER">
 <attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
