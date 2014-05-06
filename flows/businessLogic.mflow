@@ -3,15 +3,15 @@
     <global-element name="case_to_customobject" type="http://www.mulesoft.org/schema/mule/ee/data-mapper/config" entity-id="DataMapper#1">
         <properties>
             <property name="name" value="case_to_customobject"/>
-            <property name="transformationGraphPath" value="case_to_customobject.grf"/>
             <property name="auxiliary;index" value="1"/>
+            <property name="transformationGraphPath" value="case_to_customobject.grf"/>
         </properties>
     </global-element>
     <global-element name="customobject_to_case" type="http://www.mulesoft.org/schema/mule/ee/data-mapper/config" entity-id="DataMapper#2">
         <properties>
             <property name="name" value="customobject_to_case"/>
-            <property name="transformationGraphPath" value="customobject_to_case.grf"/>
             <property name="auxiliary;index" value="2"/>
+            <property name="transformationGraphPath" value="customobject_to_case.grf"/>
         </properties>
     </global-element>
     <flow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="container" SubFlow="false" type="http://www.mulesoft.org/schema/mule/batch/job" entity-id="Batch#1">
@@ -26,8 +26,8 @@
                 <property name="auxiliary;index" value="4"/>
             </property-collection>
         </properties>
-        <lane xsi:type="nestedContainer" name="Input" type="http://www.mulesoft.org/schema/mule/batch/input" hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="7899d5c4-fc27-4c6d-9dc2-aa6e958b3462"/>
-        <lane xsi:type="nestedContainer" name="Process Records" type="http://www.mulesoft.org/schema/mule/batch/process-records" hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="0c76cbe4-f447-43e0-938d-0457160b2c64">
+        <lane xsi:type="nestedContainer" name="Input" type="http://www.mulesoft.org/schema/mule/batch/input" hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="9b3e2090-88b7-4e4c-9d80-b8d3859ef06c"/>
+        <lane xsi:type="nestedContainer" name="Process Records" type="http://www.mulesoft.org/schema/mule/batch/process-records" hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="ca25564b-130b-4769-80b6-aee93a9f36d7">
             <scope type="http://www.mulesoft.org/schema/mule/batch/step" entity-id="Batch Step#1">
                 <properties>
                     <property name="filter-expression" value="#['B'.equals(flowVars['sourceSystem']) || payload['ExtId__c'] == null]"/>
@@ -38,7 +38,7 @@
                 <compartment entity-id="compartment#1">
                     <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#1">
                         <scope name="store Case" type="org.mule.tooling.ui.modules.core.scope.enricher" entity-id="Message Enricher#1">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
+                            <graphicalData x="138" y="93" width="136" height="150"/>
                             <properties>
 <property name="source" value="#[payload]"/>
 <property name="target" value="#[recordVars['caseInTargetInstance']]"/>
@@ -63,68 +63,72 @@
             <property name="serviceEndpoint"/>
             <property name="accessTokenId"/>
             <property name="config-ref" value="SalesforceB"/>
-            <property name="proxyPassword"/>
             <property name="auxiliary;index" value="8"/>
+            <property name="proxyPassword"/>
         </properties>
     </pattern>
 </lane>
                             </compartment>
                         </scope>
-                        <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#1">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
-                            <properties>
-<property name="message" value="AAAAA  PAYLOAD #[payload]  +  RECORDVARS #[recordVars['caseInTargetInstance']"/>
-<property name="category"/>
-<property name="level" value="INFO"/>
-<property name="auxiliary;index" value="9"/>
-                            </properties>
-                        </pattern>
                     </lane>
                 </compartment>
             </scope>
             <scope type="http://www.mulesoft.org/schema/mule/batch/step" entity-id="Batch Step#2">
                 <properties>
-                    <property name="filter-expression" value="#[('B'.equals(flowVars['sourceSystem'])) || (recordVars['caseInTargetInstance'] is NullPayload ? false : (recordVars['caseInTargetInstance'].get('LastModifiedDate') &gt;= payload.get('LastModifiedDate')) || !('${sfdc.a.integration.user.id}' == payload.get('LastModifiedById')))]"/>
+                    <property name="filter-expression" value="#['B'.equals(flowVars['sourceSystem']) || (recordVars['contactInTargetInstance'] is NullPayload ? false : (recordVars['contactInTargetInstance'].get('LastModifiedDate') &gt;= payload.get('LastModifiedDate')) || !('${sfdc.a.integration.user.id}' == payload.get('LastModifiedById')))]"/>
                     <property name="name" value="upsertCaseInBStep"/>
                     <property name="accept-policy"/>
                     <property name="auxiliary;index" value="10"/>
                 </properties>
+                <description></description>
                 <compartment entity-id="compartment#3">
                     <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#3">
-                        <pattern name="prepare case for upsert" type="http://www.mulesoft.org/schema/mule/core/expression-component" entity-id="Expression#1">
+                        <pattern name="call checkTargetAccount subflow" type="http://www.mulesoft.org/schema/mule/core/flow-ref" entity-id="de57354f-a749-49ac-b7e6-ba60fb1aa068">
+                            <graphicalData x="490" y="111" width="148" height="114"/>
+                            <properties>
+<property name="updated"/>
+<property name="name" value="checkTargetAccountSubflow"/>
+                            </properties>
+                            <description></description>
+                        </pattern>
+                        <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="baf8a5e0-9ef0-4716-84ea-446c953393f5">
                             <graphicalData x="0" y="0" width="0" height="0"/>
                             <properties>
-<property name="expression" value="payload.remove('LastModifiedById');&#xA;payload.remove('LastModifiedDate');&#xA;payload.remove('ContactId');&#xA;//payload.remove('AccountId');&#xA;//payload.remove('Id');&#xA;"/>
-<property name="file"/>
-<property name="evaluator"/>
+<property name="message" value="AAAAZZZZ #[payload]"/>
+<property name="category" value=""/>
+<property name="level" value="INFO"/>
+<property name="auxiliary;moved-from"/>
+<property name="updated"/>
+                            </properties>
+                            <description></description>
+                        </pattern>
+                        <pattern name="prepare case for upsert" type="http://www.mulesoft.org/schema/mule/core/expression-component" entity-id="Expression#1">
+                            <graphicalData x="698" y="121" width="122" height="94"/>
+                            <properties>
+<property name="expression" value="payload.remove('LastModifiedById');&#xA;payload.remove('LastModifiedDate');&#xA;payload.remove('ContactId');&#xA;//payload.remove('Account__c');&#xA;//payload.remove('AccountId');&#xA;"/>
+<property name="updated"/>
 <property name="auxiliary;index" value="11"/>
                             </properties>
+                            <description></description>
                         </pattern>
-                        <pattern name="check Account in instance B" type="http://www.mulesoft.org/schema/mule/core/flow-ref" entity-id="Flow Reference#1">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
+                        <pattern name="Case to CustomObject" type="http://www.mulesoft.org/schema/mule/ee/data-mapper/data-mapper-connector" entity-id="DataMapper#3">
+                            <graphicalData x="880" y="121" width="108" height="94"/>
                             <properties>
-<property name="name" value="checkTargetAccountSubflow"/>
+<property name="returnClass"/>
+<property name="stream"/>
+<property name="input-ref"/>
+<property name="target"/>
+<property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/ee/data-mapper/transform"/>
+<property name="pipeSize"/>
+<property name="config-ref" value="case_to_customobject"/>
 <property name="auxiliary;index" value="12"/>
                             </properties>
                         </pattern>
-                        <pattern name="Case to CustomObject" type="http://www.mulesoft.org/schema/mule/ee/data-mapper/data-mapper-connector" entity-id="DataMapper#3">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
-                            <properties>
-<property name="returnClass"/>
-<property name="input-ref"/>
-<property name="stream"/>
-<property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/ee/data-mapper/transform"/>
-<property name="target"/>
-<property name="config-ref" value="case_to_customobject"/>
-<property name="pipeSize"/>
-<property name="auxiliary;index" value="13"/>
-                            </properties>
-                        </pattern>
                         <scope name="Batch Commit" type="http://www.mulesoft.org/schema/mule/batch/commit" entity-id="Batch Commit#1">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
+                            <graphicalData x="1048" y="93" width="408" height="150"/>
                             <properties>
 <property name="streaming"/>
-<property name="auxiliary;index" value="14"/>
+<property name="auxiliary;index" value="13"/>
 <property name="size" value="100"/>
                             </properties>
                             <compartment entity-id="compartment#4">
@@ -135,8 +139,9 @@
             <property name="message" value="AAAAA to upsert #[payload]"/>
             <property name="category"/>
             <property name="level" value="INFO"/>
-            <property name="auxiliary;index" value="15"/>
+            <property name="auxiliary;index" value="14"/>
         </properties>
+        <description></description>
     </pattern>
     <pattern name="Upsert Case CustomObject in instance B" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#2">
         <graphicalData x="0" y="0" width="0" height="0"/>
@@ -156,12 +161,12 @@
             <property name="serviceEndpoint"/>
             <property name="accessTokenId"/>
             <property name="config-ref" value="SalesforceB"/>
+            <property name="auxiliary;index" value="15"/>
             <property name="proxyPassword"/>
-            <property name="auxiliary;index" value="16"/>
             <property-collection name="@http://www.mulesoft.org/schema/mule/sfdc/upsert-objectss;0">
                 <property name="ref" value="#[payload]"/>
-                <property name="auxiliary;wrapIn" value="17"/>
-                <property name="auxiliary;index" value="17"/>
+                <property name="auxiliary;index" value="16"/>
+                <property name="auxiliary;wrapIn" value="16"/>
             </property-collection>
         </properties>
     </pattern>
@@ -171,7 +176,7 @@
             <property name="message" value="AAAAA upsert result to B #[payload]"/>
             <property name="category"/>
             <property name="level" value="INFO"/>
-            <property name="auxiliary;index" value="18"/>
+            <property name="auxiliary;index" value="17"/>
         </properties>
     </pattern>
 </lane>
@@ -185,16 +190,16 @@
                     <property name="filter-expression" value="#['A'.equals(flowVars['sourceSystem'])  || payload['CaseId__c'] == null]"/>
                     <property name="name" value="getCaseInAStep"/>
                     <property name="accept-policy"/>
-                    <property name="auxiliary;index" value="19"/>
+                    <property name="auxiliary;index" value="18"/>
                 </properties>
                 <compartment entity-id="compartment#5">
                     <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#5">
                         <scope name="store Case" type="org.mule.tooling.ui.modules.core.scope.enricher" entity-id="Message Enricher#2">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
+                            <graphicalData x="1336" y="93" width="122" height="150"/>
                             <properties>
 <property name="source" value="#[payload]"/>
 <property name="target" value="#[recordVars['caseInTargetInstance']]"/>
-<property name="auxiliary;index" value="20"/>
+<property name="auxiliary;index" value="19"/>
                             </properties>
                             <compartment entity-id="compartment#6">
 <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#6">
@@ -215,68 +220,71 @@
             <property name="serviceEndpoint"/>
             <property name="accessTokenId"/>
             <property name="config-ref" value="SalesforceA"/>
+            <property name="auxiliary;index" value="20"/>
             <property name="proxyPassword"/>
-            <property name="auxiliary;index" value="21"/>
         </properties>
     </pattern>
 </lane>
                             </compartment>
                         </scope>
-                        <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#4">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
-                            <properties>
-<property name="message" value="BBBBB  RECORD #[payload]  + RECORDVARS  recordVars['caseInTargetInstance'] "/>
-<property name="category"/>
-<property name="level" value="INFO"/>
-<property name="auxiliary;index" value="22"/>
-                            </properties>
-                        </pattern>
                     </lane>
                 </compartment>
             </scope>
             <scope type="http://www.mulesoft.org/schema/mule/batch/step" entity-id="Batch Step#4">
                 <properties>
-                    <property name="filter-expression" value="#[('A'.equals(flowVars['sourceSystem'])) || (recordVars['caseInTargetInstance'] is NullPayload ? false : (recordVars['caseInTargetInstance'].get('LastModifiedDate') &gt;= payload.get('LastModifiedDate')) || !('${sfdc.b.integration.user.id}' == payload.get('LastModifiedById')))]"/>
+                    <property name="filter-expression" value="#['A'.equals(flowVars['sourceSystem']) || (recordVars['contactInTargetInstance'] is NullPayload ? false : (recordVars['contactInTargetInstance'].get('LastModifiedDate') &gt;= payload.get('LastModifiedDate')) || !('${sfdc.b.integration.user.id}' == payload.get('LastModifiedById')))]"/>
                     <property name="name" value="upsertCaseInAStep"/>
                     <property name="accept-policy"/>
-                    <property name="auxiliary;index" value="23"/>
+                    <property name="auxiliary;index" value="22"/>
                 </properties>
                 <compartment entity-id="compartment#7">
                     <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#7">
-                        <pattern name="prepare case for upsert" type="http://www.mulesoft.org/schema/mule/core/expression-component" entity-id="Expression#2">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
+                        <pattern name="call checkTargetAccount subflow" type="http://www.mulesoft.org/schema/mule/core/flow-ref" entity-id="53a25389-0729-4768-b636-ceab5bc67433">
+                            <graphicalData x="1934" y="111" width="148" height="114"/>
                             <properties>
-<property name="expression" value="payload.remove('LastModifiedById');&#xA;payload.remove('LastModifiedDate');&#xA;//payload.remove('ContactId');&#xA;//payload.remove('AccountId');&#xA;//payload.remove('Id');&#xA;"/>
-<property name="file"/>
-<property name="evaluator"/>
+<property name="updated"/>
+<property name="name" value="checkTargetAccountSubflow"/>
+                            </properties>
+                            <description></description>
+                        </pattern>
+                        <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="10b2b2f3-54f6-4b15-af1c-d733daf97598">
+                            <graphicalData x="2142" y="131" width="68" height="74"/>
+                            <properties>
+<property name="message" value="BBBBBZZZZ #[payload]"/>
+<property name="category" value=""/>
+<property name="level" value="INFO"/>
+<property name="auxiliary;moved-from"/>
+<property name="updated"/>
+                            </properties>
+                            <description></description>
+                        </pattern>
+                        <pattern name="prepare case for upsert" type="http://www.mulesoft.org/schema/mule/core/expression-component" entity-id="Expression#2">
+                            <graphicalData x="2270" y="121" width="122" height="94"/>
+                            <properties>
+<property name="expression" value="payload.remove('LastModifiedById');&#xA;payload.remove('LastModifiedDate');&#xA;payload.remove('ContactId');&#xA;&#xA;"/>
+<property name="updated"/>
+<property name="auxiliary;index" value="23"/>
+                            </properties>
+                            <description></description>
+                        </pattern>
+                        <pattern name="Customobject To Case" type="http://www.mulesoft.org/schema/mule/ee/data-mapper/data-mapper-connector" entity-id="DataMapper#4">
+                            <graphicalData x="2452" y="121" width="127" height="94"/>
+                            <properties>
+<property name="returnClass"/>
+<property name="stream"/>
+<property name="input-ref"/>
+<property name="target"/>
+<property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/ee/data-mapper/transform"/>
+<property name="pipeSize"/>
+<property name="config-ref" value="customobject_to_case"/>
 <property name="auxiliary;index" value="24"/>
                             </properties>
                         </pattern>
-                        <pattern name="check Account in instance B" type="http://www.mulesoft.org/schema/mule/core/flow-ref" entity-id="Flow Reference#2">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
-                            <properties>
-<property name="name" value="checkTargetAccountSubflow"/>
-<property name="auxiliary;index" value="25"/>
-                            </properties>
-                        </pattern>
-                        <pattern name="Customobject To Case" type="http://www.mulesoft.org/schema/mule/ee/data-mapper/data-mapper-connector" entity-id="DataMapper#4">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
-                            <properties>
-<property name="returnClass"/>
-<property name="input-ref"/>
-<property name="stream"/>
-<property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/ee/data-mapper/transform"/>
-<property name="target"/>
-<property name="config-ref" value="customobject_to_case"/>
-<property name="pipeSize"/>
-<property name="auxiliary;index" value="26"/>
-                            </properties>
-                        </pattern>
                         <scope name="Batch Commit" type="http://www.mulesoft.org/schema/mule/batch/commit" entity-id="Batch Commit#2">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
+                            <graphicalData x="2639" y="103" width="392" height="130"/>
                             <properties>
 <property name="streaming"/>
-<property name="auxiliary;index" value="27"/>
+<property name="auxiliary;index" value="25"/>
 <property name="size" value="100"/>
                             </properties>
                             <compartment entity-id="compartment#8">
@@ -287,7 +295,7 @@
             <property name="message" value="BBBBB to upsert #[payload]"/>
             <property name="category"/>
             <property name="level" value="INFO"/>
-            <property name="auxiliary;index" value="28"/>
+            <property name="auxiliary;index" value="26"/>
         </properties>
     </pattern>
     <pattern name="Upsert Case in instance A" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#4">
@@ -308,12 +316,12 @@
             <property name="serviceEndpoint"/>
             <property name="accessTokenId"/>
             <property name="config-ref" value="SalesforceA"/>
+            <property name="auxiliary;index" value="27"/>
             <property name="proxyPassword"/>
-            <property name="auxiliary;index" value="29"/>
             <property-collection name="@http://www.mulesoft.org/schema/mule/sfdc/upsert-objectss;0">
                 <property name="ref" value="#[payload]"/>
-                <property name="auxiliary;wrapIn" value="30"/>
-                <property name="auxiliary;index" value="30"/>
+                <property name="auxiliary;index" value="28"/>
+                <property name="auxiliary;wrapIn" value="28"/>
             </property-collection>
         </properties>
     </pattern>
@@ -323,7 +331,7 @@
             <property name="message" value="BBBBB upsert result to A #[payload]"/>
             <property name="category"/>
             <property name="level" value="INFO"/>
-            <property name="auxiliary;index" value="31"/>
+            <property name="auxiliary;index" value="29"/>
         </properties>
     </pattern>
 </lane>
@@ -336,75 +344,76 @@
                 <property name="auxiliary;index" value="5"/>
             </properties>
         </lane>
-        <lane xsi:type="nestedContainer" name="On Complete" type="http://www.mulesoft.org/schema/mule/batch/on-complete" hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="1095b169-a61e-4de4-9986-8c21a23b3796"/>
+        <lane xsi:type="nestedContainer" name="On Complete" type="http://www.mulesoft.org/schema/mule/batch/on-complete" hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="ebcc28ce-59d8-4fe8-9aba-3e9fae8e26a2"/>
         <containerBehavior>default</containerBehavior>
     </flow>
-    <flow SubFlow="true" name="checkTargetAccountSubflow" type="http://www.mulesoft.org/schema/mule/core/subflow" entity-id="5aeb797a-ac2d-411c-9d8a-14fb905b4abe">
+    <flow SubFlow="true" name="checkTargetAccountSubflow" type="http://www.mulesoft.org/schema/mule/core/subflow" entity-id="158cec19-cd92-48e5-bb61-c9c2b9559be8">
         <properties>
             <property name="initialState"/>
             <property name="processingStrategy2"/>
             <property name="processingStrategy"/>
             <property name="bussinessEventsLabel"/>
             <property name="tracking:enable-default-events"/>
-            <property name="auxiliary;index" value="33"/>
+            <property name="auxiliary;index" value="30"/>
         </properties>
-        <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#10">
+        <description></description>
+        <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#9">
             <graphicalData x="0" y="0" width="0" height="0"/>
-            <splitter index="34" name="Choice" type="org.mule.tooling.ui.modules.core.pattern.cbr" entity-id="Choice#1">
-                <graphicalData x="0" y="0" width="0" height="0"/>
+            <splitter index="31" name="Choice" type="org.mule.tooling.ui.modules.core.pattern.cbr" entity-id="Choice#1">
+                <graphicalData x="21" y="301" width="1136" height="888"/>
                 <properties>
-                    <property name=";INDEX" value="34"/>
-                    <property-collection name="9fdcad6d-5466-4ded-a8bd-1de7721499ff">
+                    <property name=";INDEX" value="31"/>
+                    <property-collection name="894e5b12-2446-4287-924c-97299fabaf0f">
                         <property name="choice.expression" value="#[payload.Account != null &amp;&amp; 'A'.equals(flowVars['sourceSystem'])]"/>
                         <property-collection name="choice.attributes">
                             <property name="expression" value="#[payload.Account != null &amp;&amp; 'A'.equals(flowVars['sourceSystem'])]"/>
                         </property-collection>
                     </property-collection>
-                    <property-collection name="82c85d89-b32b-4a7d-9384-1d462789a276">
+                    <property-collection name="a7592d19-3fb5-4421-b558-54f515a74880">
                         <property name="choice.expression" value="#[payload.Account__r != null &amp;&amp; 'B'.equals(flowVars['sourceSystem'])]"/>
                         <property-collection name="choice.attributes">
                             <property name="expression" value="#[payload.Account__r != null &amp;&amp; 'B'.equals(flowVars['sourceSystem'])]"/>
                         </property-collection>
                     </property-collection>
-                    <property-collection name="c7e666e8-51b3-45c2-a3d4-6e37378f1fdc">
+                    <property-collection name="1de52b13-dc2c-49c4-a48a-f79c00a0aade">
                         <property name="choice.otherwise" value="true"/>
                         <property-collection name="choice.attributes"/>
                     </property-collection>
                 </properties>
+                <description></description>
                 <pattern name="Choice" type="org.mule.tooling.ui.modules.core.pattern.cbr" entity-id="Choice#2">
                     <properties>
-                        <property name=";INDEX" value="34"/>
-                        <property-collection name="9fdcad6d-5466-4ded-a8bd-1de7721499ff">
+                        <property name=";INDEX" value="31"/>
+                        <property-collection name="894e5b12-2446-4287-924c-97299fabaf0f">
                             <property name="choice.expression" value="#[payload.Account != null &amp;&amp; 'A'.equals(flowVars['sourceSystem'])]"/>
                             <property-collection name="choice.attributes">
 <property name="expression" value="#[payload.Account != null &amp;&amp; 'A'.equals(flowVars['sourceSystem'])]"/>
                             </property-collection>
                         </property-collection>
-                        <property-collection name="82c85d89-b32b-4a7d-9384-1d462789a276">
+                        <property-collection name="a7592d19-3fb5-4421-b558-54f515a74880">
                             <property name="choice.expression" value="#[payload.Account__r != null &amp;&amp; 'B'.equals(flowVars['sourceSystem'])]"/>
                             <property-collection name="choice.attributes">
 <property name="expression" value="#[payload.Account__r != null &amp;&amp; 'B'.equals(flowVars['sourceSystem'])]"/>
                             </property-collection>
                         </property-collection>
-                        <property-collection name="c7e666e8-51b3-45c2-a3d4-6e37378f1fdc">
+                        <property-collection name="1de52b13-dc2c-49c4-a48a-f79c00a0aade">
                             <property name="choice.otherwise" value="true"/>
                             <property-collection name="choice.attributes"/>
                         </property-collection>
                     </properties>
                 </pattern>
                 <compartment entity-id="compartment#9">
-                    <lane hadOnlyOneElement="false" index="36" isChoiceOtherwiseLane="false" entity-id="9fdcad6d-5466-4ded-a8bd-1de7721499ff">
-                        <scope name="storeTargetAccountForB" type="org.mule.tooling.ui.modules.core.scope.enricher" entity-id="Message Enricher#3">
-                            <graphicalData x="169" y="378" width="175" height="150"/>
+                    <lane hadOnlyOneElement="false" index="33" isChoiceOtherwiseLane="false" entity-id="894e5b12-2446-4287-924c-97299fabaf0f">
+                        <scope name="store account from B in recordVar" type="org.mule.tooling.ui.modules.core.scope.enricher" entity-id="Message Enricher#3">
+                            <graphicalData x="0" y="0" width="0" height="0"/>
                             <properties>
 <property name="source" value="#[payload]"/>
 <property name="target" value="#[recordVars['targetAccount']]"/>
-<property name="auxiliary;index" value="36"/>
+<property name="auxiliary;index" value="33"/>
                             </properties>
-                            <description></description>
                             <compartment entity-id="compartment#10">
-<lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#11">
-    <pattern name="Query target Salesforce B for Account" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#5">
+<lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#10">
+    <pattern name="Query Salesforce B for Account" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#5">
         <graphicalData x="0" y="0" width="0" height="0"/>
         <properties>
             <property name=""/>
@@ -421,25 +430,25 @@
             <property name="serviceEndpoint"/>
             <property name="accessTokenId"/>
             <property name="config-ref" value="SalesforceB"/>
+            <property name="auxiliary;index" value="34"/>
             <property name="proxyPassword"/>
-            <property name="auxiliary;index" value="37"/>
         </properties>
         <description></description>
     </pattern>
 </lane>
                             </compartment>
                         </scope>
-                        <splitter index="38" name="Choice" type="org.mule.tooling.ui.modules.core.pattern.cbr" entity-id="Choice#3">
-                            <graphicalData x="404" y="315" width="481" height="277"/>
+                        <splitter index="35" name="Choice" type="org.mule.tooling.ui.modules.core.pattern.cbr" entity-id="Choice#3">
+                            <graphicalData x="0" y="0" width="0" height="0"/>
                             <properties>
-<property name=";INDEX" value="38"/>
-<property-collection name="164bae0b-312a-45f6-84f6-e5c9f96086ee">
-    <property name="choice.expression" value="#[recordVars['targetAccount'] == null]"/>
+<property name=";INDEX" value="35"/>
+<property-collection name="f74c7ff8-9418-4216-8a8e-e0a7ba23b682">
+    <property name="choice.expression" value="#[recordVars['targetAccount'] is NullPayload]"/>
     <property-collection name="choice.attributes">
-        <property name="expression" value="#[recordVars['targetAccount'] == null]"/>
+        <property name="expression" value="#[recordVars['targetAccount'] is NullPayload]"/>
     </property-collection>
 </property-collection>
-<property-collection name="98f991d2-6f32-4a18-8324-978932b3b233">
+<property-collection name="1b6ea58d-b712-4b8c-8de5-e5ab41880ce8">
     <property name="choice.otherwise" value="true"/>
     <property-collection name="choice.attributes"/>
 </property-collection>
@@ -447,124 +456,134 @@
                             <description></description>
                             <pattern name="Choice" type="org.mule.tooling.ui.modules.core.pattern.cbr" entity-id="Choice#4">
 <properties>
-    <property name=";INDEX" value="38"/>
-    <property-collection name="164bae0b-312a-45f6-84f6-e5c9f96086ee">
-        <property name="choice.expression" value="#[recordVars['targetAccount'] == null]"/>
+    <property name=";INDEX" value="35"/>
+    <property-collection name="f74c7ff8-9418-4216-8a8e-e0a7ba23b682">
+        <property name="choice.expression" value="#[recordVars['targetAccount'] is NullPayload]"/>
         <property-collection name="choice.attributes">
-            <property name="expression" value="#[recordVars['targetAccount'] == null]"/>
+            <property name="expression" value="#[recordVars['targetAccount'] is NullPayload]"/>
         </property-collection>
     </property-collection>
-    <property-collection name="98f991d2-6f32-4a18-8324-978932b3b233">
+    <property-collection name="1b6ea58d-b712-4b8c-8de5-e5ab41880ce8">
         <property name="choice.otherwise" value="true"/>
         <property-collection name="choice.attributes"/>
     </property-collection>
 </properties>
                             </pattern>
                             <compartment entity-id="compartment#11">
-<lane hadOnlyOneElement="false" index="40" isChoiceOtherwiseLane="false" entity-id="164bae0b-312a-45f6-84f6-e5c9f96086ee">
-    <scope name="storeTargetAccountForB" type="org.mule.tooling.ui.modules.core.scope.enricher" entity-id="Message Enricher#4">
-        <graphicalData x="556" y="319" width="175" height="130"/>
+<lane hadOnlyOneElement="false" index="37" isChoiceOtherwiseLane="false" entity-id="f74c7ff8-9418-4216-8a8e-e0a7ba23b682">
+    <scope name="store id of account in B target instance" type="org.mule.tooling.ui.modules.core.scope.enricher" entity-id="Message Enricher#4">
+        <graphicalData x="0" y="0" width="0" height="0"/>
         <properties>
             <property name="source" value="#[payload]"/>
             <property name="target" value="#[recordVars['targetAccount']]"/>
-            <property name="auxiliary;index" value="40"/>
+            <property name="auxiliary;index" value="37"/>
         </properties>
+        <description></description>
         <compartment entity-id="compartment#12">
-            <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#12">
-                <pattern name="Insert Account in Salesforce B" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#6">
+            <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#11">
+                <scope name="Processor Chain" type="http://www.mulesoft.org/schema/mule/core/processor-chain" entity-id="Processor Chain#1">
                     <graphicalData x="0" y="0" width="0" height="0"/>
                     <properties>
-                        <property name=""/>
-                        <property name="proxyUsername"/>
-                        <property name="securityToken"/>
-                        <property name="proxyHost"/>
-                        <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/sfdc/upsert"/>
-                        <property name="proxyPort"/>
-                        <property name="type" value="Account"/>
-                        <property name="password"/>
-                        <property name="url"/>
-                        <property name="externalIdFieldName" value="Id"/>
-                        <property name="username"/>
-                        <property name="sessionId"/>
-                        <property name="serviceEndpoint"/>
-                        <property name="accessTokenId"/>
-                        <property name="config-ref" value="SalesforceB"/>
-                        <property name="proxyPassword"/>
-                        <property name="auxiliary;index" value="41"/>
-                        <property-collection name="@http://www.mulesoft.org/schema/mule/sfdc/upsert-objectss;0">
-                            <property name="auxiliary;wrapIn" value="42"/>
-                            <property name="auxiliary;index" value="42"/>
-                            <property-collection name="@http://www.mulesoft.org/schema/mule/sfdc/upsert-objects;1">
-<property name="auxiliary;wrapIn" value="43"/>
-<property name="auxiliary;index" value="43"/>
-<property-collection name="@http://www.mulesoft.org/schema/mule/sfdc/inner-upsert-objects;1">
-    <property name="value" value="#[payload.Account.Name]"/>
-    <property name="auxiliary;wrapIn" value="44"/>
-    <property name="auxiliary;index" value="44"/>
-    <property name="key" value="Name"/>
-</property-collection>
-                            </property-collection>
-                        </property-collection>
+                        <property name="auxiliary;index" value="38"/>
                     </properties>
-                </pattern>
+                    <description></description>
+                    <compartment entity-id="compartment#13">
+                        <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#12">
+                            <pattern name="Insert Account in Salesforce B" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#6">
+<graphicalData x="829" y="392" width="112" height="94"/>
+<properties>
+    <property name="" value=""/>
+    <property name="proxyUsername" value=""/>
+    <property name="securityToken" value=""/>
+    <property name="proxyHost" value=""/>
+    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/sfdc/upsert"/>
+    <property name="proxyPort" value="80"/>
+    <property name="type" value="Account"/>
+    <property name="password" value=""/>
+    <property name="url" value=""/>
+    <property name="externalIdFieldName" value="Id"/>
+    <property name="username" value=""/>
+    <property name="sessionId" value=""/>
+    <property name="updated"/>
+    <property name="serviceEndpoint" value=""/>
+    <property name="accessTokenId" value=""/>
+    <property name="config-ref" value="SalesforceB"/>
+    <property name="proxyPassword" value=""/>
+    <property name="auxiliary;index" value="39"/>
+    <property-collection name="@http://www.mulesoft.org/schema/mule/sfdc/upsert-objectss;1">
+        <property name="auxiliary;index" value="40"/>
+        <property-collection name="@http://www.mulesoft.org/schema/mule/sfdc/upsert-objects;4f33ae35:145ce19c3be:-7ffe">
+            <property name="value-ref" value=""/>
+            <property name="key" value="Entry 1: Map&lt;k,v&gt;"/>
+            <property-collection name="@http://www.mulesoft.org/schema/mule/sfdc/inner-upsert-objects;4f33ae35:145ce19c3be:-7ffd">
+                <property name="value" value="#[payload.Account.Name]"/>
+                <property name="key" value="Name"/>
+            </property-collection>
+        </property-collection>
+    </property-collection>
+</properties>
+<description></description>
+                            </pattern>
+                            <pattern name="get the id of the account created" type="http://www.mulesoft.org/schema/mule/core/expression-transformer" entity-id="Expression#3">
+<graphicalData x="1001" y="382" width="99" height="114"/>
+<properties>
+    <property name="expression" value="#[payload[0].getId()]"/>
+    <property name="returnClass"/>
+    <property name="ignoreBadInput"/>
+    <property name="returnSourceIfNull"/>
+    <property name="name"/>
+    <property name="custom-evaluator"/>
+    <property name="encoding"/>
+    <property name="evaluator"/>
+    <property name="auxiliary;index" value="43"/>
+    <property name="mimeType"/>
+</properties>
+<description></description>
+                            </pattern>
+                        </lane>
+                    </compartment>
+                </scope>
             </lane>
         </compartment>
     </scope>
-    <pattern name="Expression" type="http://www.mulesoft.org/schema/mule/core/expression-component" entity-id="Expression#3">
-        <graphicalData x="791" y="347" width="84" height="74"/>
-        <properties>
-            <property name="expression" value="payload.put('AccountId', recordVars['targetAccount']['Id']);"/>
-            <property name="file"/>
-            <property name="evaluator"/>
-            <property name="auxiliary;index" value="45"/>
-        </properties>
-    </pattern>
-</lane>
-<lane hadOnlyOneElement="false" index="48" isChoiceOtherwiseLane="true" entity-id="98f991d2-6f32-4a18-8324-978932b3b233">
-    <pattern name="Expression" type="http://www.mulesoft.org/schema/mule/core/expression-component" entity-id="Expression#4">
+    <pattern name="store Account Id in payload" type="http://www.mulesoft.org/schema/mule/core/expression-component" entity-id="Expression#4">
         <graphicalData x="0" y="0" width="0" height="0"/>
         <properties>
-            <property name="expression" value="payload.put('AccountId', recordVars['targetAccount']['Id']);"/>
+            <property name="expression" value="payload.put('AccountId', recordVars['targetAccount']);"/>
             <property name="file"/>
             <property name="evaluator"/>
-            <property name="auxiliary;index" value="48"/>
+            <property name="auxiliary;index" value="44"/>
         </properties>
         <description></description>
     </pattern>
-    <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#8">
-        <graphicalData x="0" y="0" width="0" height="0"/>
+</lane>
+<lane hadOnlyOneElement="false" index="46" isChoiceOtherwiseLane="true" entity-id="1b6ea58d-b712-4b8c-8de5-e5ab41880ce8">
+    <pattern name="store Account Id in payload" type="http://www.mulesoft.org/schema/mule/core/expression-component" entity-id="Expression#5">
+        <graphicalData x="760" y="530" width="84" height="74"/>
         <properties>
-            <property name="message" value="YYYYYYYY response #[payload] #[recordVars['targetAccount']]"/>
-            <property name="category"/>
-            <property name="level" value="INFO"/>
-            <property name="auxiliary;index" value="49"/>
+            <property name="expression" value="payload.put('AccountId', recordVars['targetAccount']['Id']);"/>
+            <property name="file"/>
+            <property name="evaluator"/>
+            <property name="auxiliary;index" value="47"/>
         </properties>
+        <description></description>
     </pattern>
 </lane>
                             </compartment>
                         </splitter>
-                        <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#7">
-                            <graphicalData x="945" y="416" width="68" height="74"/>
-                            <properties>
-<property name="message" value="ZZZZZ new account  #[payload] #[recordVars['targetAccount']]"/>
-<property name="category"/>
-<property name="level" value="INFO"/>
-<property name="auxiliary;moved-from" value="46"/>
-                            </properties>
-                            <description></description>
-                        </pattern>
                     </lane>
-                    <lane hadOnlyOneElement="false" index="52" isChoiceOtherwiseLane="false" entity-id="82c85d89-b32b-4a7d-9384-1d462789a276">
-                        <scope name="storeTargetAccountForA" type="org.mule.tooling.ui.modules.core.scope.enricher" entity-id="Message Enricher#5">
+                    <lane hadOnlyOneElement="false" index="49" isChoiceOtherwiseLane="false" entity-id="a7592d19-3fb5-4421-b558-54f515a74880">
+                        <scope name="store account from A in recordVar" type="org.mule.tooling.ui.modules.core.scope.enricher" entity-id="Message Enricher#5">
                             <graphicalData x="0" y="0" width="0" height="0"/>
                             <properties>
 <property name="source" value="#[payload]"/>
 <property name="target" value="#[recordVars['targetAccount']]"/>
-<property name="auxiliary;index" value="52"/>
+<property name="auxiliary;index" value="49"/>
                             </properties>
-                            <compartment entity-id="compartment#13">
+                            <description></description>
+                            <compartment entity-id="compartment#14">
 <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#13">
-    <pattern name="Query target Salesforce A for Account" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#7">
+    <pattern name="Query Salesforce A for Account" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#7">
         <graphicalData x="0" y="0" width="0" height="0"/>
         <properties>
             <property name=""/>
@@ -581,40 +600,156 @@
             <property name="serviceEndpoint"/>
             <property name="accessTokenId"/>
             <property name="config-ref" value="SalesforceA"/>
+            <property name="auxiliary;index" value="50"/>
             <property name="proxyPassword"/>
-            <property name="auxiliary;index" value="53"/>
         </properties>
+        <description></description>
     </pattern>
 </lane>
                             </compartment>
                         </scope>
-                        <pattern name="LoggerXXXX" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#10">
+                        <splitter index="51" name="Choice" type="org.mule.tooling.ui.modules.core.pattern.cbr" entity-id="Choice#5">
                             <graphicalData x="0" y="0" width="0" height="0"/>
                             <properties>
-<property name="message" value="XXXXXXX response #[payload] #[recordVars['targetAccount']]"/>
-<property name="category"/>
-<property name="level" value="INFO"/>
-<property name="auxiliary;index" value="54"/>
+<property name=";INDEX" value="51"/>
+<property-collection name="a9adc315-9d74-416b-9ae7-b72e3062d38a">
+    <property name="choice.expression" value="#[recordVars['targetAccount'] is NullPayload]"/>
+    <property-collection name="choice.attributes">
+        <property name="expression" value="#[recordVars['targetAccount'] is NullPayload]"/>
+    </property-collection>
+</property-collection>
+<property-collection name="19401942-6f90-4815-8e60-d03df9beaffb">
+    <property name="choice.otherwise" value="true"/>
+    <property-collection name="choice.attributes"/>
+</property-collection>
                             </properties>
-                        </pattern>
-                        <pattern name="Expression" type="http://www.mulesoft.org/schema/mule/core/expression-component" entity-id="Expression#5">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
-                            <properties>
-<property name="expression" value="payload.put('AccountId', recordVars['targetAccount']['Id']);"/>
-<property name="file"/>
-<property name="evaluator"/>
-<property name="auxiliary;index" value="55"/>
-                            </properties>
-                        </pattern>
+                            <description></description>
+                            <pattern name="Choice" type="org.mule.tooling.ui.modules.core.pattern.cbr" entity-id="Choice#6">
+<properties>
+    <property name=";INDEX" value="51"/>
+    <property-collection name="a9adc315-9d74-416b-9ae7-b72e3062d38a">
+        <property name="choice.expression" value="#[recordVars['targetAccount'] is NullPayload]"/>
+        <property-collection name="choice.attributes">
+            <property name="expression" value="#[recordVars['targetAccount'] is NullPayload]"/>
+        </property-collection>
+    </property-collection>
+    <property-collection name="19401942-6f90-4815-8e60-d03df9beaffb">
+        <property name="choice.otherwise" value="true"/>
+        <property-collection name="choice.attributes"/>
+    </property-collection>
+</properties>
+                            </pattern>
+                            <compartment entity-id="compartment#15">
+<lane hadOnlyOneElement="false" index="53" isChoiceOtherwiseLane="false" entity-id="a9adc315-9d74-416b-9ae7-b72e3062d38a">
+    <scope name="store id of account in A target instance" type="org.mule.tooling.ui.modules.core.scope.enricher" entity-id="Message Enricher#6">
+        <graphicalData x="0" y="0" width="0" height="0"/>
+        <properties>
+            <property name="source" value="#[payload]"/>
+            <property name="target" value="#[recordVars['targetAccount']]"/>
+            <property name="auxiliary;index" value="53"/>
+        </properties>
+        <description></description>
+        <compartment entity-id="compartment#16">
+            <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#14">
+                <scope name="Processor Chain" type="http://www.mulesoft.org/schema/mule/core/processor-chain" entity-id="Processor Chain#2">
+                    <graphicalData x="0" y="0" width="0" height="0"/>
+                    <properties>
+                        <property name="auxiliary;index" value="54"/>
+                    </properties>
+                    <compartment entity-id="compartment#17">
+                        <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#15">
+                            <pattern name="Insert Account in Salesforce A" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#8">
+<graphicalData x="0" y="0" width="0" height="0"/>
+<properties>
+    <property name=""/>
+    <property name="proxyUsername"/>
+    <property name="securityToken"/>
+    <property name="proxyHost"/>
+    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/sfdc/upsert"/>
+    <property name="proxyPort"/>
+    <property name="type" value="Account"/>
+    <property name="password"/>
+    <property name="url"/>
+    <property name="externalIdFieldName" value="Id"/>
+    <property name="username"/>
+    <property name="sessionId"/>
+    <property name="serviceEndpoint"/>
+    <property name="accessTokenId"/>
+    <property name="config-ref" value="SalesforceA"/>
+    <property name="auxiliary;index" value="55"/>
+    <property name="proxyPassword"/>
+    <property-collection name="@http://www.mulesoft.org/schema/mule/sfdc/upsert-objectss;0">
+        <property name="auxiliary;index" value="56"/>
+        <property name="auxiliary;wrapIn" value="56"/>
+        <property-collection name="@http://www.mulesoft.org/schema/mule/sfdc/upsert-objects;1">
+            <property name="auxiliary;index" value="57"/>
+            <property name="auxiliary;wrapIn" value="57"/>
+            <property-collection name="@http://www.mulesoft.org/schema/mule/sfdc/inner-upsert-objects;1">
+                <property name="value" value="#[payload.Account.Name]"/>
+                <property name="key" value="Name"/>
+                <property name="auxiliary;index" value="58"/>
+                <property name="auxiliary;wrapIn" value="58"/>
+            </property-collection>
+        </property-collection>
+    </property-collection>
+</properties>
+                            </pattern>
+                            <pattern name="get the id of the account created" type="http://www.mulesoft.org/schema/mule/core/expression-transformer" entity-id="Expression#6">
+<graphicalData x="0" y="0" width="0" height="0"/>
+<properties>
+    <property name="expression" value="#[payload[0].getId()]"/>
+    <property name="returnClass"/>
+    <property name="ignoreBadInput"/>
+    <property name="returnSourceIfNull"/>
+    <property name="name"/>
+    <property name="custom-evaluator"/>
+    <property name="encoding"/>
+    <property name="evaluator"/>
+    <property name="auxiliary;index" value="59"/>
+    <property name="mimeType"/>
+</properties>
+<description></description>
+                            </pattern>
+                        </lane>
+                    </compartment>
+                </scope>
+            </lane>
+        </compartment>
+    </scope>
+    <pattern name="store Account Id in payload" type="http://www.mulesoft.org/schema/mule/core/expression-component" entity-id="Expression#7">
+        <graphicalData x="0" y="0" width="0" height="0"/>
+        <properties>
+            <property name="expression" value="payload.put('Account__c', recordVars['targetAccount']);"/>
+            <property name="file"/>
+            <property name="evaluator"/>
+            <property name="auxiliary;index" value="60"/>
+        </properties>
+        <description></description>
+    </pattern>
+</lane>
+<lane hadOnlyOneElement="false" index="62" isChoiceOtherwiseLane="true" entity-id="19401942-6f90-4815-8e60-d03df9beaffb">
+    <pattern name="store Account Id in payload" type="http://www.mulesoft.org/schema/mule/core/expression-component" entity-id="Expression#8">
+        <graphicalData x="761" y="868" width="84" height="74"/>
+        <properties>
+            <property name="expression" value="payload.put('Account__c', recordVars['targetAccount']['Id']);"/>
+            <property name="file"/>
+            <property name="evaluator"/>
+            <property name="auxiliary;index" value="63"/>
+        </properties>
+        <description></description>
+    </pattern>
+</lane>
+                            </compartment>
+                        </splitter>
                     </lane>
-                    <lane hadOnlyOneElement="false" index="57" isChoiceOtherwiseLane="true" entity-id="c7e666e8-51b3-45c2-a3d4-6e37378f1fdc">
-                        <pattern name="Do nothing" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#11">
+                    <lane hadOnlyOneElement="false" index="65" isChoiceOtherwiseLane="true" entity-id="1de52b13-dc2c-49c4-a48a-f79c00a0aade">
+                        <pattern name="if AccountId is field empty do nothing" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#9">
                             <graphicalData x="0" y="0" width="0" height="0"/>
                             <properties>
-<property name="message" value="ZZZZZZ do nothing"/>
+<property name="message" value="do nothing"/>
 <property name="category"/>
 <property name="level" value="INFO"/>
-<property name="auxiliary;index" value="57"/>
+<property name="auxiliary;index" value="65"/>
                             </properties>
                         </pattern>
                     </lane>

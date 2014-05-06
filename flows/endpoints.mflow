@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="endpoints">
-    <flow SubFlow="false" name="triggerSyncFromAFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="c3aaed46-d607-44cc-abf5-d80973f7d6aa">
+    <flow SubFlow="false" name="triggerSyncFromAFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="151b4b31-6f35-493b-984d-f7aaad212630">
         <properties>
             <property name="initialState"/>
             <property name="processingStrategy2" value="synchronous"/>
@@ -14,35 +14,36 @@
             <scope name="Poll" type="org.mule.tooling.ui.modules.core.endpoint.Poller" entity-id="Poll#1">
                 <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
-                    <property name="cron-scheduler"/>
                     <property name="frequency"/>
+                    <property name="cron-scheduler"/>
                     <property name="fixed-frequency-scheduler"/>
                     <property name="auxiliary;index" value="2"/>
                     <property-collection name="@http://www.mulesoft.org/schema/mule/core/fixed-frequency-scheduler;0">
                         <property name="frequency" value="${polling.frequency}"/>
-                        <property name="auxiliary;index" value="3"/>
                         <property name="auxiliary;wrapIn" value="3"/>
+                        <property name="auxiliary;index" value="3"/>
                     </property-collection>
                     <property-collection name="@http://www.mulesoft.org/schema/mule/core/watermark;0">
-                        <property name="default-expression" value="${watermark.default.expression}"/>
                         <property name="selector" value="MAX"/>
+                        <property name="default-expression" value="${watermark.default.expression}"/>
                         <property name="selector-expression" value="#[payload.LastModifiedDate]"/>
                         <property name="variable" value="lastQueryDateA"/>
-                        <property name="auxiliary;index" value="4"/>
                         <property name="auxiliary;wrapIn" value="4"/>
+                        <property name="auxiliary;index" value="4"/>
                     </property-collection>
                 </properties>
+                <description></description>
                 <compartment entity-id="compartment#1">
                     <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#2">
                         <pattern name="fetch cases from A" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#1">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
+                            <graphicalData x="35" y="75" width="122" height="94"/>
                             <properties>
 <property name="" value=""/>
 <property name="proxyUsername" value=""/>
 <property name="fetchSize" value=""/>
 <property name="securityToken" value=""/>
 <property name="proxyHost" value=""/>
-<property name="query" value="dsql:SELECT Id,AccountId,ContactId,Description,Subject,LastModifiedDate,LastModifiedById,Origin,Priority,Status, ExtId__c,&#xA;Contact.Id, Contact.FirstName, Contact.LastName, Contact.Email, Account.Id, Account.Name&#xA;&#xA;FROM Case&#xA;WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateA']] ORDER BY LastModifiedDate ASC LIMIT 200"/>
+<property name="query" value="dsql:SELECT Id,Description,Subject,LastModifiedDate,LastModifiedById,Origin,Priority,Status, ExtId__c,&#xA;ContactId, Contact.FirstName, Contact.LastName, Contact.Email, AccountId, Account.Name&#xA;&#xA;FROM Case&#xA;WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateA']] ORDER BY LastModifiedDate ASC LIMIT 200"/>
 <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/sfdc/query"/>
 <property name="proxyPort" value="80"/>
 <property name="password" value=""/>
@@ -76,8 +77,8 @@
                 <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
                     <property name="variableName" value="sourceSystem"/>
-                    <property name="value" value="A"/>
                     <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/core/set-variable"/>
+                    <property name="value" value="A"/>
                     <property name="auxiliary;index" value="7"/>
                 </properties>
             </pattern>
@@ -90,7 +91,7 @@
             </pattern>
         </lane>
     </flow>
-    <flow SubFlow="false" name="triggerSyncFromBFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="3cf4246c-eaf5-463a-bec0-e186f66bf5a0">
+    <flow SubFlow="false" name="triggerSyncFromBFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="a98485a9-2363-4bfe-a831-c318fb099b0e">
         <properties>
             <property name="initialState"/>
             <property name="processingStrategy2" value="synchronous"/>
@@ -104,22 +105,22 @@
             <scope name="Poll" type="org.mule.tooling.ui.modules.core.endpoint.Poller" entity-id="Poll#2">
                 <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
-                    <property name="cron-scheduler"/>
                     <property name="frequency"/>
+                    <property name="cron-scheduler"/>
                     <property name="fixed-frequency-scheduler"/>
                     <property name="auxiliary;index" value="10"/>
                     <property-collection name="@http://www.mulesoft.org/schema/mule/core/fixed-frequency-scheduler;0">
                         <property name="frequency" value="${polling.frequency}"/>
-                        <property name="auxiliary;index" value="11"/>
                         <property name="auxiliary;wrapIn" value="11"/>
+                        <property name="auxiliary;index" value="11"/>
                     </property-collection>
                     <property-collection name="@http://www.mulesoft.org/schema/mule/core/watermark;0">
-                        <property name="default-expression" value="${watermark.default.expression}"/>
                         <property name="selector" value="MAX"/>
+                        <property name="default-expression" value="${watermark.default.expression}"/>
                         <property name="selector-expression" value="#[payload.LastModifiedDate]"/>
                         <property name="variable" value="lastQueryDateB"/>
-                        <property name="auxiliary;index" value="12"/>
                         <property name="auxiliary;wrapIn" value="12"/>
+                        <property name="auxiliary;index" value="12"/>
                     </property-collection>
                 </properties>
                 <compartment entity-id="compartment#2">
@@ -132,7 +133,7 @@
 <property name="fetchSize" value=""/>
 <property name="securityToken" value=""/>
 <property name="proxyHost" value=""/>
-<property name="query" value="dsql:SELECT Id,Description__c,Subject__c,LastModifiedDate,LastModifiedById,Origin__c,Priority__c,Status__c, CaseId__c,&#xA;Contact__c,Contact__r.FirstName, Contact__r.LastName, Contact__r.Email, Account__c,Account__r.Name&#xA;FROM Case__c&#xA;WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateB']] ORDER BY LastModifiedDate ASC LIMIT 200"/>
+<property name="query" value="dsql:SELECT Id,Description__c,Subject__c,LastModifiedDate,LastModifiedById,Origin__c,Priority__c,Status__c, CaseId__c,&#xA;Contact__c, Contact__r.FirstName, Contact__r.LastName, Contact__r.Email, Account__c,Account__r.Name&#xA;FROM Case__c&#xA;WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateB']] ORDER BY LastModifiedDate ASC LIMIT 200"/>
 <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/sfdc/query"/>
 <property name="proxyPort" value="80"/>
 <property name="password" value=""/>
@@ -166,8 +167,8 @@
                 <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
                     <property name="variableName" value="sourceSystem"/>
-                    <property name="value" value="B"/>
                     <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/core/set-variable"/>
+                    <property name="value" value="B"/>
                     <property name="auxiliary;index" value="15"/>
                 </properties>
             </pattern>

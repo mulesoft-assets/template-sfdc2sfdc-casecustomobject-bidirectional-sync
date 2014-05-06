@@ -9,8 +9,8 @@ http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/ba
         <poll doc:name="Poll">
             <fixed-frequency-scheduler frequency="${polling.frequency}"/>
             <watermark variable="lastQueryDateA" default-expression="${watermark.default.expression}" selector="MAX" selector-expression="#[payload.LastModifiedDate]"/>
-            <sfdc:query config-ref="SalesforceA" query="dsql:SELECT Id,AccountId,ContactId,Description,Subject,LastModifiedDate,LastModifiedById,Origin,Priority,Status, ExtId__c,
-Contact.Id, Contact.FirstName, Contact.LastName, Contact.Email, Account.Id, Account.Name
+            <sfdc:query config-ref="SalesforceA" query="dsql:SELECT Id,Description,Subject,LastModifiedDate,LastModifiedById,Origin,Priority,Status, ExtId__c,
+ContactId, Contact.FirstName, Contact.LastName, Contact.Email, AccountId, Account.Name
 
 FROM Case
 WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateA']] ORDER BY LastModifiedDate ASC LIMIT 200" doc:name="fetch cases from A"/>
@@ -24,7 +24,7 @@ WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateA']] ORDER BY LastModifiedD
             <fixed-frequency-scheduler frequency="${polling.frequency}"/>
             <watermark variable="lastQueryDateB" default-expression="${watermark.default.expression}" selector="MAX" selector-expression="#[payload.LastModifiedDate]"/>
             <sfdc:query config-ref="SalesforceB" query="dsql:SELECT Id,Description__c,Subject__c,LastModifiedDate,LastModifiedById,Origin__c,Priority__c,Status__c, CaseId__c,
-Contact__c,Contact__r.FirstName, Contact__r.LastName, Contact__r.Email, Account__c,Account__r.Name
+Contact__c, Contact__r.FirstName, Contact__r.LastName, Contact__r.Email, Account__c,Account__r.Name
 FROM Case__c
 WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateB']] ORDER BY LastModifiedDate ASC LIMIT 200" doc:name="fetch Case custom Objects from B"/>
         </poll>
