@@ -18,7 +18,10 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
             
             </batch:step>
             <batch:step name="upsertCaseInBStep" filter-expression="#['B'.equals(flowVars['sourceSystem']) || (recordVars['contactInTargetInstance'] is NullPayload ? false : (recordVars['contactInTargetInstance'].get('LastModifiedDate') >= payload.get('LastModifiedDate')) || !('${sfdc.a.integration.user.id}' == payload.get('LastModifiedById')))]">
-                <flow-ref name="checkTargetAccountSubflow" doc:name="call checkTargetAccount subflow"/>
+                <batch:set-record-variable variableName="#[payload.Account]" value="#[recordVars['createAccount']]" doc:name="prepare record Variable for subflow"/>
+                <enricher source="#[payload]" doc:name="Message Enricher">
+                    <flow-ref name="checkTargetAccountSubflow" doc:name="call checkTargetAccount subflow"/>
+                </enricher>
                 <logger message="AAAAZZZZ #[payload]" level="INFO" doc:name="Logger"/>
                 <expression-component doc:name="prepare case for upsert"><![CDATA[payload.remove('LastModifiedById');
 payload.remove('LastModifiedDate');
@@ -42,7 +45,6 @@ payload.remove('ContactId');
                 </enricher>
             </batch:step>
             <batch:step name="upsertCaseInAStep" filter-expression="#['A'.equals(flowVars['sourceSystem']) || (recordVars['contactInTargetInstance'] is NullPayload ? false : (recordVars['contactInTargetInstance'].get('LastModifiedDate') &gt;= payload.get('LastModifiedDate')) || !('${sfdc.b.integration.user.id}' == payload.get('LastModifiedById')))]">
-                <flow-ref name="checkTargetAccountSubflow" doc:name="call checkTargetAccount subflow"/>
                 <logger message="BBBBBZZZZ #[payload]" level="INFO" doc:name="Logger"/>
                 <expression-component doc:name="prepare case for upsert"><![CDATA[payload.remove('LastModifiedById');
 payload.remove('LastModifiedDate');
@@ -64,9 +66,9 @@ payload.remove('ContactId');
     </batch:job>
     <sub-flow name="checkTargetAccountSubflow" doc:name="checkTargetAccountSubflow">
         <choice doc:name="Choice">
-            <when expression="#[payload.Account != null &amp;&amp; 'A'.equals(flowVars['sourceSystem'])]">
+            <when expression="#[recordVars['createAccount'] != null &amp;&amp; 'A'.equals(flowVars['sourceSystem'])]">
                 <enricher source="#[payload]" target="#[recordVars['targetAccount']]" doc:name="store account from B in recordVar">
-                    <sfdc:query-single config-ref="SalesforceB" query="SELECT Id, Name from Account WHERE Name = '#[payload.Account.Name]'" doc:name="Query Salesforce B for Account"/>
+                    <sfdc:query-single config-ref="SalesforceB" query="SELECT Id, Name from Account WHERE Name = '#[recordVars['createAccount'].Name]'" doc:name="Query Salesforce B for Account"/>
                 </enricher>
                 <choice doc:name="Choice">
                     <when expression="#[recordVars['targetAccount'] is NullPayload]">
@@ -89,9 +91,9 @@ payload.remove('ContactId');
                     </otherwise>
                 </choice>
             </when>
-            <when expression="#[payload.Account__r != null &amp;&amp; 'B'.equals(flowVars['sourceSystem'])]">
+            <when expression="#[recordVars['createAccount'] != null &amp;&amp; 'B'.equals(flowVars['sourceSystem'])]">
                 <enricher source="#[payload]" target="#[recordVars['targetAccount']]" doc:name="store account from A in recordVar">
-                    <sfdc:query-single config-ref="SalesforceA" query="SELECT Id, Name from Account WHERE Name = '#[payload.Account__r.Name]'" doc:name="Query Salesforce A for Account"/>
+                    <sfdc:query-single config-ref="SalesforceA" query="SELECT Id, Name from Account WHERE Name = '#[recordVars['createAccount'].Name]'" doc:name="Query Salesforce A for Account"/>
                 </enricher>
                 <choice doc:name="Choice">
                     <when expression="#[recordVars['targetAccount'] is NullPayload]">
@@ -107,10 +109,10 @@ payload.remove('ContactId');
                                 <expression-transformer expression="#[payload[0].getId()]" doc:name="get the id of the account created"/>
                             </processor-chain>
                         </enricher>
-                        <expression-component doc:name="store Account Id in payload"><![CDATA[payload.put('Account__c', recordVars['targetAccount']);]]></expression-component>
+                        <expression-component doc:name="store Account Id in payload"><![CDATA[payload.put('AccountId', recordVars['targetAccount']);]]></expression-component>
                     </when>
                     <otherwise>
-                        <expression-component doc:name="store Account Id in payload"><![CDATA[payload.put('Account__c', recordVars['targetAccount']['Id']);]]></expression-component>
+                        <expression-component doc:name="store Account Id in payload"><![CDATA[payload.put('AccountId', recordVars['targetAccount']['Id']);]]></expression-component>
                     </otherwise>
                 </choice>
             </when>
