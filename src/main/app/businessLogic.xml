@@ -15,17 +15,17 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
                 <enricher source="#[payload]" target="#[recordVars['caseInTargetInstance']]" doc:name="store Case">
 	            	<sfdc:query-single config-ref="SalesforceB" query="SELECT Id, Subject__c, LastModifiedDate FROM Case__c WHERE Id = '#[payload['ExtId__c']]'" doc:name="query Case CustomObject  from B"/>
                 </enricher>
-                <logger message="AAAAA  PAYLOAD #[payload]  +  RECORDVARS #[recordVars['caseInTargetInstance']" level="INFO" doc:name="Logger"/>
             
             </batch:step>
-            <batch:step name="upsertCaseInBStep" filter-expression="#[('B'.equals(flowVars['sourceSystem'])) || (recordVars['caseInTargetInstance'] is NullPayload ? false : (recordVars['caseInTargetInstance'].get('LastModifiedDate') &gt;= payload.get('LastModifiedDate')) || !('${sfdc.a.integration.user.id}' == payload.get('LastModifiedById')))]">
+            <batch:step name="upsertCaseInBStep" filter-expression="#['B'.equals(flowVars['sourceSystem']) || (recordVars['contactInTargetInstance'] is NullPayload ? false : (recordVars['contactInTargetInstance'].get('LastModifiedDate') >= payload.get('LastModifiedDate')) || !('${sfdc.a.integration.user.id}' == payload.get('LastModifiedById')))]">
+                <flow-ref name="checkTargetAccountSubflow" doc:name="call checkTargetAccount subflow"/>
+                <logger message="AAAAZZZZ #[payload]" level="INFO" doc:name="Logger"/>
                 <expression-component doc:name="prepare case for upsert"><![CDATA[payload.remove('LastModifiedById');
 payload.remove('LastModifiedDate');
 payload.remove('ContactId');
+//payload.remove('Account__c');
 //payload.remove('AccountId');
-//payload.remove('Id');
 ]]></expression-component>
-                <flow-ref name="checkTargetAccountSubflow" doc:name="check Account in instance B"/>
                 <data-mapper:transform config-ref="case_to_customobject" doc:name="Case to CustomObject"/>
                 <batch:commit size="100" doc:name="Batch Commit">
                     <logger message="AAAAA to upsert #[payload]" level="INFO" doc:name="Logger"/>
@@ -40,16 +40,15 @@ payload.remove('ContactId');
                 <enricher source="#[payload]" target="#[recordVars['caseInTargetInstance']]" doc:name="store Case">
                     <sfdc:query-single config-ref="SalesforceA" query="SELECT Id, Subject, LastModifiedDate FROM Case WHERE Id = '#[payload['CaseId__c']]' " doc:name="query Case Object from instance A"/>
                 </enricher>
-                <logger message="BBBBB  RECORD #[payload]  + RECORDVARS  recordVars['caseInTargetInstance'] " level="INFO" doc:name="Logger"/>
             </batch:step>
-            <batch:step name="upsertCaseInAStep" filter-expression="#[('A'.equals(flowVars['sourceSystem'])) || (recordVars['caseInTargetInstance'] is NullPayload ? false : (recordVars['caseInTargetInstance'].get('LastModifiedDate') &gt;= payload.get('LastModifiedDate')) || !('${sfdc.b.integration.user.id}' == payload.get('LastModifiedById')))]">
+            <batch:step name="upsertCaseInAStep" filter-expression="#['A'.equals(flowVars['sourceSystem']) || (recordVars['contactInTargetInstance'] is NullPayload ? false : (recordVars['contactInTargetInstance'].get('LastModifiedDate') &gt;= payload.get('LastModifiedDate')) || !('${sfdc.b.integration.user.id}' == payload.get('LastModifiedById')))]">
+                <flow-ref name="checkTargetAccountSubflow" doc:name="call checkTargetAccount subflow"/>
+                <logger message="BBBBBZZZZ #[payload]" level="INFO" doc:name="Logger"/>
                 <expression-component doc:name="prepare case for upsert"><![CDATA[payload.remove('LastModifiedById');
 payload.remove('LastModifiedDate');
-//payload.remove('ContactId');
-//payload.remove('AccountId');
-//payload.remove('Id');
+payload.remove('ContactId');
+
 ]]></expression-component>
-                <flow-ref name="checkTargetAccountSubflow" doc:name="check Account in instance B"/>
                 <data-mapper:transform doc:name="Customobject To Case" config-ref="customobject_to_case"/>
                 <batch:commit size="100" doc:name="Batch Commit">
                     <logger message="BBBBB to upsert #[payload]" level="INFO" doc:name="Logger"/>
@@ -66,38 +65,57 @@ payload.remove('LastModifiedDate');
     <sub-flow name="checkTargetAccountSubflow" doc:name="checkTargetAccountSubflow">
         <choice doc:name="Choice">
             <when expression="#[payload.Account != null &amp;&amp; 'A'.equals(flowVars['sourceSystem'])]">
-                <enricher source="#[payload]" target="#[recordVars['targetAccount']]" doc:name="storeTargetAccountForB">
-                    <sfdc:query-single config-ref="SalesforceB" query="SELECT Id, Name from Account WHERE Name = '#[payload.Account.Name]'" doc:name="Query target Salesforce B for Account"/>
+                <enricher source="#[payload]" target="#[recordVars['targetAccount']]" doc:name="store account from B in recordVar">
+                    <sfdc:query-single config-ref="SalesforceB" query="SELECT Id, Name from Account WHERE Name = '#[payload.Account.Name]'" doc:name="Query Salesforce B for Account"/>
                 </enricher>
                 <choice doc:name="Choice">
-                    <when expression="#[recordVars['targetAccount'] == null]">
-                        <enricher source="#[payload]" target="#[recordVars['targetAccount']]" doc:name="storeTargetAccountForB">
-                            <sfdc:upsert config-ref="SalesforceB" externalIdFieldName="Id" type="Account" doc:name="Insert Account in Salesforce B">
-                                <sfdc:objects>
-                                    <sfdc:object>
-                                        <sfdc:inner-object key="Name">#[payload.Account.Name]</sfdc:inner-object>
-                                    </sfdc:object>
-                                </sfdc:objects>
-                            </sfdc:upsert>
+                    <when expression="#[recordVars['targetAccount'] is NullPayload]">
+                        <enricher source="#[payload]" target="#[recordVars['targetAccount']]" doc:name="store id of account in B target instance">
+                            <processor-chain doc:name="Processor Chain">
+                                <sfdc:upsert config-ref="SalesforceB" externalIdFieldName="Id" type="Account" doc:name="Insert Account in Salesforce B">
+                                    <sfdc:objects>
+                                        <sfdc:object>
+                                            <sfdc:inner-object key="Name">#[payload.Account.Name]</sfdc:inner-object>
+                                        </sfdc:object>
+                                    </sfdc:objects>
+                                </sfdc:upsert>
+                                <expression-transformer expression="#[payload[0].getId()]" doc:name="get the id of the account created"/>
+                            </processor-chain>
                         </enricher>
-                        <expression-component doc:name="Expression"><![CDATA[payload.put('AccountId', recordVars['targetAccount']['Id']);]]></expression-component>
+                        <expression-component doc:name="store Account Id in payload"><![CDATA[payload.put('AccountId', recordVars['targetAccount']);]]></expression-component>
                     </when>
                     <otherwise>
-                        <expression-component doc:name="Expression"><![CDATA[payload.put('AccountId', recordVars['targetAccount']['Id']);]]></expression-component>
-                        <logger message="YYYYYYYY response #[payload] #[recordVars['targetAccount']]" level="INFO" doc:name="Logger"/>
+                        <expression-component doc:name="store Account Id in payload"><![CDATA[payload.put('AccountId', recordVars['targetAccount']['Id']);]]></expression-component>
                     </otherwise>
                 </choice>
-                <logger message="ZZZZZ new account  #[payload] #[recordVars['targetAccount']]" level="INFO" doc:name="Logger"/>
             </when>
             <when expression="#[payload.Account__r != null &amp;&amp; 'B'.equals(flowVars['sourceSystem'])]">
-                <enricher source="#[payload]" target="#[recordVars['targetAccount']]" doc:name="storeTargetAccountForA">
-                    <sfdc:query-single config-ref="SalesforceA" query="SELECT Id, Name from Account WHERE Name = '#[payload.Account__r.Name]'" doc:name="Query target Salesforce A for Account"/>
+                <enricher source="#[payload]" target="#[recordVars['targetAccount']]" doc:name="store account from A in recordVar">
+                    <sfdc:query-single config-ref="SalesforceA" query="SELECT Id, Name from Account WHERE Name = '#[payload.Account__r.Name]'" doc:name="Query Salesforce A for Account"/>
                 </enricher>
-                <logger message="XXXXXXX response #[payload] #[recordVars['targetAccount']]" level="INFO" doc:name="LoggerXXXX"/>
-                <expression-component doc:name="Expression"><![CDATA[payload.put('AccountId', recordVars['targetAccount']['Id']);]]></expression-component>
+                <choice doc:name="Choice">
+                    <when expression="#[recordVars['targetAccount'] is NullPayload]">
+                        <enricher source="#[payload]" target="#[recordVars['targetAccount']]" doc:name="store id of account in A target instance">
+                            <processor-chain doc:name="Processor Chain">
+                                <sfdc:upsert config-ref="SalesforceA" externalIdFieldName="Id" type="Account" doc:name="Insert Account in Salesforce A">
+                                    <sfdc:objects >
+                                        <sfdc:object>
+                                            <sfdc:inner-object key="Name">#[payload.Account.Name]</sfdc:inner-object>
+                                        </sfdc:object>
+                                    </sfdc:objects>
+                                </sfdc:upsert>
+                                <expression-transformer expression="#[payload[0].getId()]" doc:name="get the id of the account created"/>
+                            </processor-chain>
+                        </enricher>
+                        <expression-component doc:name="store Account Id in payload"><![CDATA[payload.put('Account__c', recordVars['targetAccount']);]]></expression-component>
+                    </when>
+                    <otherwise>
+                        <expression-component doc:name="store Account Id in payload"><![CDATA[payload.put('Account__c', recordVars['targetAccount']['Id']);]]></expression-component>
+                    </otherwise>
+                </choice>
             </when>
             <otherwise>
-                <logger message="ZZZZZZ do nothing" level="INFO" doc:name="Do nothing"/>
+                <logger message="do nothing" level="INFO" doc:name="if AccountId is field empty do nothing"/>
             </otherwise>
         </choice>
     </sub-flow>
