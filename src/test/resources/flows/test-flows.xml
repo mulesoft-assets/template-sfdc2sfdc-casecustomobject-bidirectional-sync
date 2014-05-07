@@ -15,17 +15,17 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
             <sfdc:objects ref="#[payload]"/>
         </sfdc:create>
     </sub-flow>
-        <sub-flow name="createCaseInBFlowaaa" doc:name="createCaseInBFlow">
+        <sub-flow name="createCaseInBFlow" doc:name="createCaseInBFlow">
         <sfdc:create config-ref="SalesforceB" type="Lead" doc:name="Salesforce">
             <sfdc:objects ref="#[payload]"/>
         </sfdc:create>
     </sub-flow>
-    <sub-flow name="deleteCase__cFromAFlow" doc:name="deleteCase__cFromAFlow">
+    <sub-flow name="deleteCaseFromAFlow" doc:name="deleteCaseFromAFlow">
         <sfdc:delete config-ref="SalesforceA" doc:name="Salesforce">
             <sfdc:ids ref="#[payload]"/>
         </sfdc:delete>
     </sub-flow>
-    <sub-flow name="deleteCase__cFromBFlow" doc:name="deleteCase__cFromBFlow">
+    <sub-flow name="deleteCaseFromBFlow" doc:name="deleteCaseFromBFlow">
         <sfdc:delete config-ref="SalesforceB" doc:name="Salesforce">
             <sfdc:ids ref="#[payload]"/>
         </sfdc:delete>

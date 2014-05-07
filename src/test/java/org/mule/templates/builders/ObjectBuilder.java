@@ -38,6 +38,10 @@ public class ObjectBuilder {
 		return new ObjectBuilder();
 	}
 
+	public static ObjectBuilder aCase() {
+		return new ObjectBuilder();
+	}
+
 	public static ObjectBuilder anAccount() {
 		return new ObjectBuilder();
 	}
