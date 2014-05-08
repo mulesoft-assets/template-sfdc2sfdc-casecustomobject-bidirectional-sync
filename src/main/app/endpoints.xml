@@ -15,8 +15,9 @@ ContactId, Contact.FirstName, Contact.LastName, Contact.Email, AccountId, Accoun
 FROM Case
 WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateA']] ORDER BY LastModifiedDate ASC LIMIT 200" doc:name="fetch cases from A"/>
         </poll>
-        <logger message="triggerSyncFromAFlow records #[flowVars['lastQueryDateA']] #[payload.size()] " level="INFO" doc:name="log number of records"/>
+
         <set-variable variableName="sourceSystem" value="A" doc:name="set sourceSystem to 'A'"/>
+        <logger message="triggerSyncFromAFlow records #[flowVars['lastQueryDateA']] #[payload.size()] flowVar sourceSystem  #[flowVars['sourceSystem']]" level="INFO" doc:name="log number of records"/>
         <batch:execute name="syncCasesBatch" doc:name="call "/>
     </flow>
     <flow name="triggerSyncFromBFlow" doc:name="triggerSyncFromBFlow" processingStrategy="synchronous">
@@ -26,10 +27,11 @@ WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateA']] ORDER BY LastModifiedD
             <sfdc:query config-ref="SalesforceB" query="dsql:SELECT Id,Description__c,Subject__c,LastModifiedDate,LastModifiedById,Origin__c,Priority__c,Status__c, CaseId__c,
 Contact__c, Contact__r.FirstName, Contact__r.LastName, Contact__r.Email, Account__c,Account__r.Name
 FROM Case__c
-WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateB']] ORDER BY LastModifiedDate ASC LIMIT 200" doc:name="fetch Case custom Objects from B"/>
+WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateB']] ORDER BY LastModifiedDate ASC LIMIT 200" doc:name="fetch case__c objects from B"/>
         </poll>
-        <logger message="triggerSyncFromBFlow #[flowVars['lastQueryDateB']] #[payload.size()]" level="INFO" doc:name="log number of records"/>
+
         <set-variable variableName="sourceSystem" value="B" doc:name="set sourceSystem to 'B'"/>
+        <logger message="triggerSyncFromBFlow #[flowVars['lastQueryDateB']] #[payload.size()] flowVar sourceSystem  #[flowVars['sourceSystem']]" level="INFO" doc:name="log number of records"/>
         <batch:execute name="syncCasesBatch" doc:name="Batch Execute"/>
     </flow>
 </mule>

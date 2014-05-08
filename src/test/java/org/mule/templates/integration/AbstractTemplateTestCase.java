@@ -13,6 +13,7 @@ import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.schedule.Scheduler;
 import org.mule.api.schedule.Schedulers;
+import org.mule.construct.Flow;
 import org.mule.context.notification.NotificationException;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -101,7 +102,6 @@ public class AbstractTemplateTestCase extends FunctionalTestCase {
 		File graphFile = new File(pathToResource);
 
 		properties.put(MuleProperties.APP_HOME_DIRECTORY_PROPERTY, graphFile.getAbsolutePath());
-
 		return properties;
 	}
 
@@ -135,6 +135,10 @@ public class AbstractTemplateTestCase extends FunctionalTestCase {
 		else {
 			return (Map<String, Object>) resultPayload;
 		}
+	}
+
+	protected Flow getFlow(String flowName) {
+		return (Flow) muleContext.getRegistry().lookupObject(flowName);
 	}
 
 }

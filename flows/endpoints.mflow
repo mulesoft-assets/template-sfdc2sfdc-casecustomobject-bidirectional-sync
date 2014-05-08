@@ -9,13 +9,13 @@
             <property name="tracking:enable-default-events" value="false"/>
             <property name="auxiliary;index" value="1"/>
             <property name="updated"/>
-            <property-collection name="@http://www.mulesoft.org/schema/mule/ee/tracking/transaction;395417770"/>
+            <property-collection name="@http://www.mulesoft.org/schema/mule/ee/tracking/transaction;1526184214"/>
         </properties>
         <description></description>
         <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#1">
             <graphicalData x="0" y="0" width="0" height="0"/>
             <scope name="Poll" type="org.mule.tooling.ui.modules.core.endpoint.Poller" entity-id="Poll#1">
-                <graphicalData x="0" y="0" width="0" height="0"/>
+                <graphicalData x="21" y="89" width="150" height="130"/>
                 <properties>
                     <property name="frequency"/>
                     <property name="cron-scheduler"/>
@@ -62,19 +62,8 @@
                     </lane>
                 </compartment>
             </scope>
-            <pattern name="log number of records" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#1">
-                <graphicalData x="0" y="0" width="0" height="0"/>
-                <properties>
-                    <property name="message" value="triggerSyncFromAFlow records #[flowVars['lastQueryDateA']] #[payload.size()] "/>
-                    <property name="category" value=""/>
-                    <property name="level" value="INFO"/>
-                    <property name="updated"/>
-                    <property name="auxiliary;index" value="6"/>
-                </properties>
-                <description></description>
-            </pattern>
             <pattern name="set sourceSystem to 'A'" type="http://www.mulesoft.org/schema/mule/core/variable-transformer" entity-id="Variable#1">
-                <graphicalData x="0" y="0" width="0" height="0"/>
+                <graphicalData x="400" y="107" width="127" height="94"/>
                 <properties>
                     <property name="variableName" value="sourceSystem"/>
                     <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/core/set-variable"/>
@@ -83,8 +72,18 @@
                 </properties>
                 <description></description>
             </pattern>
-            <pattern name="call " type="http://www.mulesoft.org/schema/mule/batch/execute" entity-id="Batch Execute#1">
+            <pattern name="log number of records" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#1">
                 <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name="message" value="triggerSyncFromAFlow records #[flowVars['lastQueryDateA']] #[payload.size()] flowVar sourceSystem  #[flowVars['sourceSystem']]"/>
+                    <property name="category" value=""/>
+                    <property name="level" value="INFO"/>
+                    <property name="updated"/>
+                </properties>
+                <description></description>
+            </pattern>
+            <pattern name="call " type="http://www.mulesoft.org/schema/mule/batch/execute" entity-id="Batch Execute#1">
+                <graphicalData x="587" y="117" width="68" height="74"/>
                 <properties>
                     <property name="updated"/>
                     <property name="name" value="syncCasesBatch"/>
@@ -103,13 +102,13 @@
             <property name="tracking:enable-default-events" value="false"/>
             <property name="auxiliary;index" value="9"/>
             <property name="updated"/>
-            <property-collection name="@http://www.mulesoft.org/schema/mule/ee/tracking/transaction;1218123844"/>
+            <property-collection name="@http://www.mulesoft.org/schema/mule/ee/tracking/transaction;971426036"/>
         </properties>
         <description></description>
         <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#3">
             <graphicalData x="0" y="0" width="0" height="0"/>
             <scope name="Poll" type="org.mule.tooling.ui.modules.core.endpoint.Poller" entity-id="Poll#2">
-                <graphicalData x="0" y="0" width="0" height="0"/>
+                <graphicalData x="21" y="292" width="144" height="150"/>
                 <properties>
                     <property name="frequency"/>
                     <property name="cron-scheduler"/>
@@ -129,9 +128,10 @@
                         <property name="auxiliary;index" value="12"/>
                     </property-collection>
                 </properties>
+                <description></description>
                 <compartment entity-id="compartment#2">
                     <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#4">
-                        <pattern name="fetch Case custom Objects from B" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#2">
+                        <pattern name="fetch case__c objects from B" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#2">
                             <graphicalData x="0" y="0" width="0" height="0"/>
                             <properties>
 <property name=""/>
@@ -152,23 +152,13 @@
 <property name="proxyPassword"/>
 <property name="auxiliary;index" value="13"/>
                             </properties>
+                            <description></description>
                         </pattern>
                     </lane>
                 </compartment>
             </scope>
-            <pattern name="log number of records" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#2">
-                <graphicalData x="0" y="0" width="0" height="0"/>
-                <properties>
-                    <property name="message" value="triggerSyncFromBFlow #[flowVars['lastQueryDateB']] #[payload.size()]"/>
-                    <property name="category" value=""/>
-                    <property name="level" value="INFO"/>
-                    <property name="updated"/>
-                    <property name="auxiliary;index" value="14"/>
-                </properties>
-                <description></description>
-            </pattern>
             <pattern name="set sourceSystem to 'B'" type="http://www.mulesoft.org/schema/mule/core/variable-transformer" entity-id="Variable#2">
-                <graphicalData x="0" y="0" width="0" height="0"/>
+                <graphicalData x="394" y="320" width="127" height="94"/>
                 <properties>
                     <property name="variableName" value="sourceSystem"/>
                     <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/core/set-variable"/>
@@ -177,8 +167,18 @@
                 </properties>
                 <description></description>
             </pattern>
-            <pattern name="Batch Execute" type="http://www.mulesoft.org/schema/mule/batch/execute" entity-id="Batch Execute#2">
+            <pattern name="log number of records" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#2">
                 <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name="message" value="triggerSyncFromBFlow #[flowVars['lastQueryDateB']] #[payload.size()] flowVar sourceSystem  #[flowVars['sourceSystem']]"/>
+                    <property name="category" value=""/>
+                    <property name="level" value="INFO"/>
+                    <property name="updated"/>
+                </properties>
+                <description></description>
+            </pattern>
+            <pattern name="Batch Execute" type="http://www.mulesoft.org/schema/mule/batch/execute" entity-id="Batch Execute#2">
+                <graphicalData x="581" y="330" width="106" height="74"/>
                 <properties>
                     <property name="updated"/>
                     <property name="name" value="syncCasesBatch"/>
