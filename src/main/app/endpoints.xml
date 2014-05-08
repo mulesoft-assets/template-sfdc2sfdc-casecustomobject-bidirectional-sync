@@ -15,9 +15,9 @@ ContactId, Contact.FirstName, Contact.LastName, Contact.Email, AccountId, Accoun
 FROM Case
 WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateA']] ORDER BY LastModifiedDate ASC LIMIT 200" doc:name="fetch cases from A"/>
         </poll>
-        <logger message="AAAAAAAAAA #[flowVars['lastQueryDateA']] #[payload.size()] " level="INFO" doc:name="Logger"/>
-        <set-variable variableName="sourceSystem" value="A" doc:name="Variable"/>
-        <batch:execute name="batch" doc:name="Batch Execute"/>
+        <logger message="triggerSyncFromAFlow records #[flowVars['lastQueryDateA']] #[payload.size()] " level="INFO" doc:name="log number of records"/>
+        <set-variable variableName="sourceSystem" value="A" doc:name="set sourceSystem to 'A'"/>
+        <batch:execute name="syncCasesBatch" doc:name="call "/>
     </flow>
     <flow name="triggerSyncFromBFlow" doc:name="triggerSyncFromBFlow" processingStrategy="synchronous">
         <poll doc:name="Poll">
@@ -28,8 +28,8 @@ Contact__c, Contact__r.FirstName, Contact__r.LastName, Contact__r.Email, Account
 FROM Case__c
 WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateB']] ORDER BY LastModifiedDate ASC LIMIT 200" doc:name="fetch Case custom Objects from B"/>
         </poll>
-        <logger message="BBBBBBBBBBBB #[flowVars['lastQueryDateB']] #[payload.size()]" level="INFO" doc:name="Logger"/>
-        <set-variable variableName="sourceSystem" value="B" doc:name="Variable"/>
-        <batch:execute name="batch" doc:name="Batch Execute"/>
+        <logger message="triggerSyncFromBFlow #[flowVars['lastQueryDateB']] #[payload.size()]" level="INFO" doc:name="log number of records"/>
+        <set-variable variableName="sourceSystem" value="B" doc:name="set sourceSystem to 'B'"/>
+        <batch:execute name="syncCasesBatch" doc:name="Batch Execute"/>
     </flow>
 </mule>

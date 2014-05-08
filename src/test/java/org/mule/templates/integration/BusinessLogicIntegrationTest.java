@@ -1,5 +1,6 @@
 package org.mule.templates.integration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,18 +8,17 @@ import java.util.Map;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.log4j.Logger;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
-import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.streaming.ConsumerIterator;
 import org.mule.templates.builders.ObjectBuilder;
 
 import com.mulesoft.module.batch.BatchTestHelper;
+import com.sforce.soap.partner.SaveResult;
 
 /**
  * The objective of this class is to validate the correct behavior of the flows for this Mule Template that make calls to external systems.
@@ -27,13 +27,9 @@ public class BusinessLogicIntegrationTest extends AbstractTemplateTestCase {
 
 	protected static final int TIMEOUT = 60;
 	private static final Logger log = Logger.getLogger(BusinessLogicIntegrationTest.class);
-	private static final String POLL_FLOW_NAME = "triggerFlow";
 	private BatchTestHelper helper;
 	Map<String, Object> caseA = null;
 	Map<String, Object> caseB = null;
-
-	@Rule
-	public DynamicPort port = new DynamicPort("http.port");
 
 	@BeforeClass
 	public static void init() {
@@ -46,75 +42,119 @@ public class BusinessLogicIntegrationTest extends AbstractTemplateTestCase {
 
 	@Before
 	public void setUp() throws Exception {
-		stopFlowSchedulers(POLL_FLOW_NAME);
+		stopFlowSchedulers(POLL_FLOW_A);
+		stopFlowSchedulers(POLL_FLOW_B);
+
 		registerListeners();
 		helper = new BatchTestHelper(muleContext);
-
 		createCases();
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		stopFlowSchedulers(POLL_FLOW_NAME);
+
+		stopFlowSchedulers(POLL_FLOW_A);
+		stopFlowSchedulers(POLL_FLOW_B);
 		deleteCases();
 	}
 
 	@Test
+	@SuppressWarnings({ "unchecked" })
 	public void testMainFlow() throws Exception {
-		// Run poll and wait for it to run
-		runSchedulersOnce(POLL_FLOW_NAME);
-		waitForPollToRun();
+		System.err.println("mainflow %%%%%%%%%%%%%%%%%");
 
-		// Wait for the batch job executed by the poll flow to finish
+		// run Pooler A
+		runSchedulersOnce(POLL_FLOW_A);
+		waitForPollAToRun();
 		helper.awaitJobTermination(TIMEOUT_SEC * 1000, 500);
 		helper.assertJobWasSuccessful();
 
-		// Prepare payload
-		final Map<String, Object> userToRetrieveMail = new HashMap<String, Object>();
-		log.info("userToRetrieveMail: " + userToRetrieveMail);
+		System.err.println("case A " + this.caseA);
+		System.err.println("case B " + this.caseB);
 
-		// Execute selectUserFromDB sublow
-		SubflowInterceptingChainLifecycleWrapper selectUserFromDBFlow = getSubFlow("selectUserFromDB");
-		final MuleEvent event = selectUserFromDBFlow.process(getTestEvent(userToRetrieveMail, MessageExchangePattern.REQUEST_RESPONSE));
-		final List<Map<String, Object>> payload = (List<Map<String, Object>>) event.getMessage().getPayload();
+		// check the data in B
+		SubflowInterceptingChainLifecycleWrapper subflow = getSubFlow("queryCaseInBFlow");
+		subflow.initialise();
+		Map<String, Object> caseB = new HashMap<String, Object>();
+		caseB.put("CaseId__c", this.caseA.get("Id"));
+		MuleEvent event = subflow.process(getTestEvent(caseB, MessageExchangePattern.REQUEST_RESPONSE));
+		ConsumerIterator<Object> result = (ConsumerIterator<Object>) event.getMessage().getPayload();
+		System.err.println("queryCaseInBFlow result: ");
+		while (result.hasNext()) {
+			Object o = result.next();
+			System.err.println(o.getClass());
+			System.err.println(o);
+		}
 
-		// print result
-		for (Map<String, Object> usr : payload)
-			log.info("selectUserFromDB response: " + usr);
+		// run Pooler B
+		runSchedulersOnce(POLL_FLOW_B);
+		waitForPollBToRun();
+		helper.awaitJobTermination(TIMEOUT_SEC * 1000, 500);
+		helper.assertJobWasSuccessful();
 
-		// User previously created in Salesforce should be present in database
-		Assert.assertEquals("The user should have been sync", 1, payload.size());
+		// check the data in A
+		subflow = getSubFlow("queryCaseInAFlow");
+		subflow.initialise();
+		Map<String, Object> caseA = new HashMap<String, Object>();
+		caseA.put("ExtId__c", this.caseB.get("Id"));
+		event = subflow.process(getTestEvent(caseA, MessageExchangePattern.REQUEST_RESPONSE));
+		result = (ConsumerIterator<Object>) event.getMessage().getPayload();
+		System.err.println("queryCaseInAFlow result: ");
+		while (result.hasNext()) {
+			Object o = result.next();
+			System.err.println(o.getClass());
+			System.err.println(o);
+		}
+
+		System.err.println("mainflow end %%%%%%%%%%%%%%%%%");
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void createCases() throws Exception {
 		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("createCaseInAFlow");
 		flow.initialise();
 		caseA = createCase();
+		List casesA = new ArrayList();
+		casesA.add(caseA);
 
-		MuleEvent event = flow.process(getTestEvent(caseA, MessageExchangePattern.REQUEST_RESPONSE));
-		Object result = event.getMessage().getPayload();
-		log.info("createCaseInAFlow result: " + result);
+		MuleEvent event = flow.process(getTestEvent(casesA, MessageExchangePattern.REQUEST_RESPONSE));
+		List<SaveResult> result = (List<SaveResult>) event.getMessage().getPayload();
+		log.error("createCaseInAFlow result: " + result.get(0));
+		caseA.put("Id", result.get(0).getId());
 
 		flow = getSubFlow("createCaseInBFlow");
 		flow.initialise();
-		caseB = createCase();
+		caseB = createCase__c();
+		List casesB = new ArrayList();
+		casesB.add(caseB);
 
-		event = flow.process(getTestEvent(caseA, MessageExchangePattern.REQUEST_RESPONSE));
-		result = event.getMessage().getPayload();
-		log.info("createCaseInBFlow result: " + result);
+		event = flow.process(getTestEvent(casesB, MessageExchangePattern.REQUEST_RESPONSE));
+		result = (List<SaveResult>) event.getMessage().getPayload();
+		log.error("createCaseInBFlow result: " + result.get(0));
+		caseB.put("Id", result.get(0).getId());
+
+		System.err.println("Created Case A " + caseA);
+		System.err.println("Created Case__c B " + caseB);
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void deleteCases() throws Exception {
 		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("deleteCaseFromAFlow");
 		flow.initialise();
+		List casesA = new ArrayList();
+		casesA.add(caseA.get("Id"));
 
-		MuleEvent event = flow.process(getTestEvent(caseA, MessageExchangePattern.REQUEST_RESPONSE));
+		MuleEvent event = flow.process(getTestEvent(casesA, MessageExchangePattern.REQUEST_RESPONSE));
 		Object result = event.getMessage().getPayload();
-		log.info("deleteCaseFromAFlow result: " + result);
+		System.err.println("deleteCaseFromAFlow result: " + result);
 
-		event = flow.process(getTestEvent(caseA, MessageExchangePattern.REQUEST_RESPONSE));
+		List casesB = new ArrayList();
+		casesB.add(caseB.get("Id"));
+
+		flow = getSubFlow("deleteCaseFromBFlow");
+		event = flow.process(getTestEvent(casesB, MessageExchangePattern.REQUEST_RESPONSE));
 		result = event.getMessage().getPayload();
-		log.info("createCaseInBFlow result: " + result);
+		System.err.println("createCaseInBFlow result: " + result);
 	}
 
 	private Map<String, Object> createCase() {

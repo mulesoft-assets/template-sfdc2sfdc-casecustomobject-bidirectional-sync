@@ -2,9 +2,7 @@ package org.mule.templates.integration;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
 
@@ -13,7 +11,8 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.schedule.Scheduler;
+import org.mule.api.schedule.Schedulers;
 import org.mule.context.notification.NotificationException;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -35,17 +34,27 @@ public class AbstractTemplateTestCase extends FunctionalTestCase {
 	private static final String MULE_DEPLOY_PROPERTIES_PATH = "./src/main/app/mule-deploy.properties";
 
 	protected static final int TIMEOUT_SEC = 120;
-	protected static final String POLL_FLOW_NAME = "triggerFlow";
+	protected static final String POLL_FLOW_A = "triggerSyncFromAFlow";
+	protected static final String POLL_FLOW_B = "triggerSyncFromBFlow";
 	protected static final String TEMPLATE_NAME = "user-broadcast";
 
-	protected final Prober pollProber = new PollingProber(60000, 1000l);
-	protected final PipelineSynchronizeListener pipelineListener = new PipelineSynchronizeListener(POLL_FLOW_NAME);
-
-	protected SubflowInterceptingChainLifecycleWrapper retrieveContactFromBFlow;
-	protected SubflowInterceptingChainLifecycleWrapper retrieveAccountFlowFromB;
+	protected final Prober pollProberA = new PollingProber(60000, 1000l);
+	protected final Prober pollProberB = new PollingProber(60000, 1000l);
+	protected final PipelineSynchronizeListener pipelineListenerA = new PipelineSynchronizeListener(POLL_FLOW_A);
+	protected final PipelineSynchronizeListener pipelineListenerB = new PipelineSynchronizeListener(POLL_FLOW_B);
 
 	@Rule
 	public DynamicPort port = new DynamicPort("http.port");
+
+	protected void startFlowSchedulers(String flowName) throws MuleException
+	{
+		final Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(
+				Schedulers.flowConstructPollingSchedulers(flowName));
+		for (final Scheduler scheduler : schedulers)
+		{
+			scheduler.start();
+		}
+	}
 
 	@Override
 	protected String getConfigResources() {
@@ -97,13 +106,20 @@ public class AbstractTemplateTestCase extends FunctionalTestCase {
 	}
 
 	protected void registerListeners() throws NotificationException {
-		muleContext.registerListener(pipelineListener);
+		muleContext.registerListener(pipelineListenerA);
+		muleContext.registerListener(pipelineListenerB);
 	}
 
-	protected void waitForPollToRun() {
-		System.out.println("Waiting for poll to run ones...");
-		pollProber.check(new ListenerProbe(pipelineListener));
-		System.out.println("Poll flow done");
+	protected void waitForPollAToRun() {
+		System.err.println("Waiting for poll A to run ones...");
+		pollProberA.check(new ListenerProbe(pipelineListenerA));
+		System.err.println("Poll flow A done");
+	}
+
+	protected void waitForPollBToRun() {
+		System.err.println("Waiting for B poll to run ones...");
+		pollProberB.check(new ListenerProbe(pipelineListenerB));
+		System.err.println("Poll flow B done");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -119,81 +135,6 @@ public class AbstractTemplateTestCase extends FunctionalTestCase {
 		else {
 			return (Map<String, Object>) resultPayload;
 		}
-	}
-
-	protected void deleteTestContactsFromSandBoxB(List<Map<String, Object>> createdContactsInA) throws InitialisationException,
-			MuleException, Exception {
-		List<Map<String, Object>> createdContactsInB = new ArrayList<Map<String, Object>>();
-		for (Map<String, Object> c : createdContactsInA) {
-			Map<String, Object> contact = invokeRetrieveFlow(retrieveContactFromBFlow, c);
-			if (contact != null) {
-				createdContactsInB.add(contact);
-			}
-		}
-		SubflowInterceptingChainLifecycleWrapper deleteContactFromBFlow = getSubFlow("deleteContactFromBFlow");
-		deleteContactFromBFlow.initialise();
-		deleteTestEntityFromSandBox(deleteContactFromBFlow, createdContactsInB);
-	}
-
-	protected void deleteTestAccountsFromSandBoxA(List<Map<String, Object>> createdAccountsInA) throws InitialisationException,
-			MuleException, Exception {
-		SubflowInterceptingChainLifecycleWrapper deleteAccountFromAFlow = getSubFlow("deleteAccountFromAFlow");
-		deleteAccountFromAFlow.initialise();
-
-		deleteTestEntityFromSandBox(deleteAccountFromAFlow, createdAccountsInA);
-	}
-
-	protected void deleteTestAccountsFromSandBoxB(List<Map<String, Object>> createdAccountsInA) throws InitialisationException,
-			MuleException, Exception {
-		List<Map<String, Object>> createdAccountsInB = new ArrayList<Map<String, Object>>();
-		for (Map<String, Object> a : createdAccountsInA) {
-			Map<String, Object> account = invokeRetrieveFlow(retrieveAccountFlowFromB, a);
-			if (account != null) {
-				createdAccountsInB.add(account);
-			}
-		}
-
-		SubflowInterceptingChainLifecycleWrapper deleteAccountFromBFlow = getSubFlow("deleteAccountFromBFlow");
-		deleteAccountFromBFlow.initialise();
-		deleteTestEntityFromSandBox(deleteAccountFromBFlow, createdAccountsInB);
-	}
-
-	protected void deleteTestEntityFromSandBox(SubflowInterceptingChainLifecycleWrapper deleteFlow, List<Map<String, Object>> entitities)
-			throws MuleException, Exception {
-		List<String> idList = new ArrayList<String>();
-		for (Map<String, Object> c : entitities) {
-			idList.add(c.get("Id")
-					.toString());
-		}
-		deleteFlow.process(getTestEvent(idList, MessageExchangePattern.REQUEST_RESPONSE));
-	}
-
-	protected String buildUniqueName(String templateName, String name) {
-		String timeStamp = new Long(new Date().getTime()).toString();
-
-		StringBuilder builder = new StringBuilder();
-		builder.append(name);
-		builder.append(templateName);
-		builder.append(timeStamp);
-
-		return builder.toString();
-	}
-
-	protected String buildUniqueEmail(String user) {
-		String server = "fakemail";
-		String timeStamp = new Long(new Date().getTime()).toString();
-
-		StringBuilder builder = new StringBuilder();
-		builder.append(user);
-		builder.append(".");
-		builder.append(timeStamp);
-		builder.append("@");
-		builder.append(server);
-		builder.append(TEMPLATE_NAME);
-		builder.append(".com");
-
-		return builder.toString();
-
 	}
 
 }

@@ -11,14 +11,20 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
     <sub-flow name="createCaseInAFlow" doc:name="createCaseInAFlow">
-        <sfdc:create config-ref="SalesforceA" type="Lead" doc:name="Salesforce">
+        <sfdc:create config-ref="SalesforceA" type="Case" doc:name="Salesforce">
             <sfdc:objects ref="#[payload]"/>
         </sfdc:create>
     </sub-flow>
-        <sub-flow name="createCaseInBFlow" doc:name="createCaseInBFlow">
-        <sfdc:create config-ref="SalesforceB" type="Lead" doc:name="Salesforce">
+    <sub-flow name="createCaseInBFlow" doc:name="createCaseInBFlow">
+        <sfdc:create config-ref="SalesforceB" type="Case__c" doc:name="Salesforce">
             <sfdc:objects ref="#[payload]"/>
         </sfdc:create>
+    </sub-flow>
+    <sub-flow name="queryCaseInAFlow" doc:name="queryCaseInAFlow">
+        <sfdc:query config-ref="SalesforceA" query="SELECT Id, Subject, ExtId__c, LastModifiedDate FROM Case WHERE ExtId__c = '#[payload['ExtId__c']]'" doc:name="Salesforce"/>
+    </sub-flow>
+    <sub-flow name="queryCaseInBFlow" doc:name="queryCaseInBFlow">
+        <sfdc:query config-ref="SalesforceB" query="SELECT Id, Subject__c, LastModifiedDate, CaseId__c  FROM Case__c WHERE CaseId__c = '#[payload['CaseId__c']]'" doc:name="Salesforce"/>
     </sub-flow>
     <sub-flow name="deleteCaseFromAFlow" doc:name="deleteCaseFromAFlow">
         <sfdc:delete config-ref="SalesforceA" doc:name="Salesforce">
@@ -26,6 +32,7 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
         </sfdc:delete>
     </sub-flow>
     <sub-flow name="deleteCaseFromBFlow" doc:name="deleteCaseFromBFlow">
+        <logger message="DELEEEEEEEEEEETE  #[payload]" level="INFO" doc:name="Logger"/>
         <sfdc:delete config-ref="SalesforceB" doc:name="Salesforce">
             <sfdc:ids ref="#[payload]"/>
         </sfdc:delete>
