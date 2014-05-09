@@ -88,25 +88,37 @@
             </scope>
             <scope type="http://www.mulesoft.org/schema/mule/batch/step" entity-id="Batch Step#2">
                 <properties>
-                    <property name="filter-expression" value="#['B'.equals(flowVars['sourceSystem']) || (recordVars['casetInTargetInstance'] is NullPayload ? false : (recordVars['caseInTargetInstance'].get('LastModifiedDate') &gt;= payload.get('LastModifiedDate')) || '${sfdc.a.integration.user.id}' != payload.get('LastModifiedById'))]"/>
+                    <property name="filter-expression" value="#['B'.equals(flowVars['sourceSystem'])]"/>
+                    <property name="updated"/>
                     <property name="name" value="upsertCaseInBStep"/>
-                    <property name="accept-policy"/>
+                    <property name="accept-policy" value="NO_FAILURES"/>
                     <property name="auxiliary;index" value="9"/>
                 </properties>
                 <description></description>
                 <compartment entity-id="compartment#3">
                     <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#3">
-                        <pattern name="set accountToCreate variable" type="http://www.mulesoft.org/schema/mule/batch/record-variable-transformer" entity-id="Record Variable#1">
+                        <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="c4cc2f0e-1daa-480a-b2c5-c60a5ef9dfb7">
                             <graphicalData x="0" y="0" width="0" height="0"/>
+                            <properties>
+<property name="message" value="AAAAA #['B'.equals(flowVars['sourceSystem']) || (recordVars['casetInTargetInstance'] is NullPayload ? false : (recordVars['caseInTargetInstance'].get('LastModifiedDate') &gt;= payload.get('LastModifiedDate')) || '${sfdc.a.integration.user.id}' != payload.get('LastModifiedById'))]"/>
+<property name="category" value=""/>
+<property name="level" value="INFO"/>
+<property name="updated"/>
+                            </properties>
+                            <description></description>
+                        </pattern>
+                        <pattern name="set accountToCreate variable" type="http://www.mulesoft.org/schema/mule/batch/record-variable-transformer" entity-id="Record Variable#1">
+                            <graphicalData x="486" y="101" width="126" height="114"/>
                             <properties>
 <property name="variableName" value="accountToCreate"/>
 <property name="value" value="#[payload.Account]"/>
 <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/batch/set-record-variable"/>
 <property name="auxiliary;index" value="10"/>
                             </properties>
+                            <description></description>
                         </pattern>
                         <scope name="store subflow result in targetAccount" type="org.mule.tooling.ui.modules.core.scope.enricher" entity-id="Message Enricher#2">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
+                            <graphicalData x="672" y="93" width="258" height="130"/>
                             <properties>
 <property name="source" value="#[payload]"/>
 <property name="target" value="#[recordVars['targetAccount']]"/>
@@ -127,7 +139,7 @@
                             </compartment>
                         </scope>
                         <pattern name="set contactToCreate variable" type="http://www.mulesoft.org/schema/mule/batch/record-variable-transformer" entity-id="Record Variable#2">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
+                            <graphicalData x="990" y="101" width="123" height="114"/>
                             <properties>
 <property name="variableName" value="contactToCreate"/>
 <property name="value" value="#[payload.Contact]"/>
@@ -136,7 +148,7 @@
                             </properties>
                         </pattern>
                         <scope name="store subflow result in targetContact" type="org.mule.tooling.ui.modules.core.scope.enricher" entity-id="Message Enricher#3">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
+                            <graphicalData x="1173" y="93" width="255" height="130"/>
                             <properties>
 <property name="source" value="#[payload]"/>
 <property name="target" value="#[recordVars['targetContact']]"/>
@@ -157,7 +169,7 @@
                             </compartment>
                         </scope>
                         <pattern name="prepare Case for upsert" type="http://www.mulesoft.org/schema/mule/core/expression-component" entity-id="Expression#1">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
+                            <graphicalData x="1488" y="111" width="124" height="94"/>
                             <properties>
 <property name="expression" value="payload.remove('LastModifiedById');&#xA;payload.remove('LastModifiedDate');&#xA;// add target contact id&#xA;if(!(recordVars['targetContact'] is NullPayload)){&#xA;&#x9;payload.put('ContactId', recordVars['targetContact']);&#xA;}&#xA;// add target account id &#xA;if(!(recordVars['targetAccount'] is NullPayload)){&#xA;&#x9;payload.put('AccountId', recordVars['targetAccount']);&#xA;}"/>
 <property name="file"/>
@@ -167,7 +179,7 @@
                             <description></description>
                         </pattern>
                         <pattern name="transform Case to Case__c" type="http://www.mulesoft.org/schema/mule/ee/data-mapper/data-mapper-connector" entity-id="DataMapper#3">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
+                            <graphicalData x="1672" y="111" width="113" height="94"/>
                             <properties>
 <property name="returnClass"/>
 <property name="stream"/>
@@ -180,7 +192,7 @@
                             </properties>
                         </pattern>
                         <scope name="Batch Commit" type="http://www.mulesoft.org/schema/mule/batch/commit" entity-id="Batch Commit#1">
-                            <graphicalData x="0" y="0" width="0" height="0"/>
+                            <graphicalData x="1845" y="93" width="429" height="130"/>
                             <properties>
 <property name="streaming"/>
 <property name="auxiliary;index" value="18"/>

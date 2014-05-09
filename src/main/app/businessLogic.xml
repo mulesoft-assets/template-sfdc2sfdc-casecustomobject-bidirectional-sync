@@ -18,7 +18,8 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
             
             </batch:step>
             <!-- TODO  remove the negation in the last condition of filter expression -->
-            <batch:step name="upsertCaseInBStep" filter-expression="#['B'.equals(flowVars['sourceSystem']) || (recordVars['casetInTargetInstance'] is NullPayload ? false : (recordVars['caseInTargetInstance'].get('LastModifiedDate') &gt;= payload.get('LastModifiedDate')) || '${sfdc.a.integration.user.id}' != payload.get('LastModifiedById'))]">
+            <batch:step name="upsertCaseInBStep" filter-expression="#['B'.equals(flowVars['sourceSystem'])]">
+                <logger message="AAAAA #['B'.equals(flowVars['sourceSystem']) || (recordVars['casetInTargetInstance'] is NullPayload ? false : (recordVars['caseInTargetInstance'].get('LastModifiedDate') &gt;= payload.get('LastModifiedDate')) || '${sfdc.a.integration.user.id}' != payload.get('LastModifiedById'))]" level="INFO" doc:name="Logger"/>
                 <batch:set-record-variable variableName="accountToCreate" value="#[payload.Account]" doc:name="set accountToCreate variable"/>
                 <enricher source="#[payload]" target="#[recordVars['targetAccount']]" doc:name="store subflow result in targetAccount">
                     <flow-ref name="checkTargetAccountSubflow" doc:name="call checkTargetAccount"/>

@@ -4,7 +4,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.mule.templates</groupId>
-	<artifactId>template-sfdc2sfdc-case2custom-bidirectional-sync</artifactId>
+	<artifactId>template-sfdc2sfdc-case-customobject-bidirectional-sync</artifactId>
 	<packaging>mule</packaging>
 	<version>1.0.0</version>
 	<name>SFDC2SFDC-Case2CustomObject Mule Template Project</name>
