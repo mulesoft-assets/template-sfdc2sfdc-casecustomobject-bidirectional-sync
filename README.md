@@ -75,7 +75,9 @@ The query fields list must include both 'Email' and 'LastModifiedDate' fields, a
 #### Structure of the Case object
 
 To be able to match pair Case object in orgA with Case custom object in orgB we needed to extend Case object in orgA with following field. 
+
 + ExtId__c `Text(50) External ID`
+
 Feel free to customize the name of this field, but keep in mind that you will need to update all occurences in flows for this particular field reference.
 
 
