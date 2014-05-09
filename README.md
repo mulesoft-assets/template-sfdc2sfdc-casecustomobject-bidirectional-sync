@@ -76,17 +76,18 @@ The query fields list must include both 'Email' and 'LastModifiedDate' fields, a
 
 To be able to match pair Case object in orgA with Case custom object in orgB we needed to extend Case object in orgA with following field. 
 
-+ ExtId__c `Text(50) External ID`
++ ExtId__c `Text(50) External ID` external id which is referecing ID of Case__c in orgB
 
 Feel free to customize the name of this field, but keep in mind that you will need to update all occurences in flows for this particular field reference.
 
 
 #### Structure of the Case Custom object
 
-In this particular template we named the Custom object `Case`, that is the API name of the Custom object in orgB is `Case__c`, so all soql queries, datamapper conversions are issued to this particular object. Case__c custom object inherits all required fields from Case in orgA together with description and subject field.
+In this particular template we named the Custom object `Case`, that is the API name of the Custom object in orgB is `Case__c`, so all soql queries, datamapper conversions are issued to this particular object. Case__c custom object inherits all required fields from Case in orgA together with Description__c, Subject__c text fields and
+Contact__c and Account__c lookup fields.
 
 + Account__c `Lookup(Account)`
-+ CaseId__c `Text(50) External ID`
++ CaseId__c `Text(50) External ID` external id which is referecing ID of Case in orgA
 + Contact__c `Lookup(Contact)`
 + Description__c `Text(50)`
 + Origin__c `Text(50) Required`
