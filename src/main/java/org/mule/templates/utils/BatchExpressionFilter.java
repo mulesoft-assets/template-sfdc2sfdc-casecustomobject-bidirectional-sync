@@ -21,6 +21,5 @@ public class BatchExpressionFilter {
 		// System.err.println("user " + payload.get("LastModifiedById"));
 		// }
 		return result;
-
 	}
 }

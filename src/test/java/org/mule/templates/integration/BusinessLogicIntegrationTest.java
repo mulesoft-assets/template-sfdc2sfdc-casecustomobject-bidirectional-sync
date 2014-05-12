@@ -18,7 +18,6 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.processor.chain.InterceptingChainLifecycleWrapper;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
 import org.mule.templates.builders.ObjectBuilder;
 
@@ -40,21 +39,15 @@ public class BusinessLogicIntegrationTest extends AbstractTemplateTestCase {
 	Map<String, Object> caseB = null;
 	private BatchTestHelper batchTestHelper;
 
-	// Javier
-	private Map<String, Object> userToUpdate;
-	private SubflowInterceptingChainLifecycleWrapper updateUserInAFlow;
-	private SubflowInterceptingChainLifecycleWrapper updateUserInBFlow;
-	private InterceptingChainLifecycleWrapper queryUserFromAFlow;
-	private InterceptingChainLifecycleWrapper queryUserFromBFlow;
-
 	@BeforeClass
 	public static void beforeTestClass() {
 		System.setProperty("page.size", "1000");
 		System.setProperty("polling.frequency", "10000");
-		System.clearProperty("watermark.default.expression");
 
 		DateTime now = new DateTime(DateTimeZone.UTC);
+		now = now.minus(1000 * 60 * 10);
 		DateTimeFormatter dateFormat = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		System.clearProperty("watermark.default.expression");
 		System.setProperty("watermark.default.expression", now.toString(dateFormat));
 	}
 
@@ -64,6 +57,7 @@ public class BusinessLogicIntegrationTest extends AbstractTemplateTestCase {
 		getAndInitializeFlows();
 		batchTestHelper = new BatchTestHelper(muleContext);
 		// registerListeners();
+		createCaseA();
 	}
 
 	@After
@@ -108,11 +102,10 @@ public class BusinessLogicIntegrationTest extends AbstractTemplateTestCase {
 	@Test
 	@SuppressWarnings({ "unchecked" })
 	public void testPollA() throws Exception {
-		System.err.println("mainflow A %%%%%%%%%%%%%%%%%");
-		createCaseA();
+		System.err.println("testPollA start");
 
 		// Execution
-		executeWaitAndAssertBatchJob("syncCasesBatch");
+		executeWaitAndAssertBatchJob(A_INBOUND_FLOW_NAME);
 
 		// System.err.println("case A " + this.caseA);
 		//
@@ -131,39 +124,39 @@ public class BusinessLogicIntegrationTest extends AbstractTemplateTestCase {
 		// System.err.println(o);
 		// }
 
-		System.err.println("mainflow A end %%%%%%%%%%%%%%%%%");
+		System.err.println("testPollA end");
 	}
 
-	@Test
-	@SuppressWarnings({ "unchecked" })
-	public void testPollB() throws Exception {
-		// System.err.println("mainflow B %%%%%%%%%%%%%%%%%");
-		// createCaseB();
-		//
-		// // run Pooler B
-		// runSchedulersOnce(POLL_FLOW_B);
-		// waitForPollBToRun();
-		// helper.awaitJobTermination(TIMEOUT_SEC * 1000, DELAY);
-		// helper.assertJobWasSuccessful();
-		//
-		// // check the data in A
-		// SubflowInterceptingChainLifecycleWrapper subflow = getSubFlow("queryCaseInAFlow");
-		// subflow.initialise();
-		// Map<String, Object> caseA = new HashMap<String, Object>();
-		// caseA.put("ExtId__c", this.caseB.get("Id"));
-		// System.err.println("quering A where ExtId__c = " + caseA.get("ExtId__c"));
-		//
-		// MuleEvent event = subflow.process(getTestEvent(caseA, MessageExchangePattern.REQUEST_RESPONSE));
-		// ConsumerIterator<Object> result = (ConsumerIterator<Object>) event.getMessage().getPayload();
-		// System.err.println("queryCaseInAFlow result: ");
-		// while (result.hasNext()) {
-		// Object o = result.next();
-		// System.err.println(o.getClass());
-		// System.err.println(o);
-		// }
-		//
-		// System.err.println("mainflow B end%%%%%%%%%%%%%%%%%");
-	}
+	// @Test
+	// @SuppressWarnings({ "unchecked" })
+	// public void testPollB() throws Exception {
+	// System.err.println("mainflow B %%%%%%%%%%%%%%%%%");
+	// createCaseB();
+	//
+	// // run Pooler B
+	// runSchedulersOnce(POLL_FLOW_B);
+	// waitForPollBToRun();
+	// helper.awaitJobTermination(TIMEOUT_SEC * 1000, DELAY);
+	// helper.assertJobWasSuccessful();
+	//
+	// // check the data in A
+	// SubflowInterceptingChainLifecycleWrapper subflow = getSubFlow("queryCaseInAFlow");
+	// subflow.initialise();
+	// Map<String, Object> caseA = new HashMap<String, Object>();
+	// caseA.put("ExtId__c", this.caseB.get("Id"));
+	// System.err.println("quering A where ExtId__c = " + caseA.get("ExtId__c"));
+	//
+	// MuleEvent event = subflow.process(getTestEvent(caseA, MessageExchangePattern.REQUEST_RESPONSE));
+	// ConsumerIterator<Object> result = (ConsumerIterator<Object>) event.getMessage().getPayload();
+	// System.err.println("queryCaseInAFlow result: ");
+	// while (result.hasNext()) {
+	// Object o = result.next();
+	// System.err.println(o.getClass());
+	// System.err.println(o);
+	// }
+	//
+	// System.err.println("mainflow B end%%%%%%%%%%%%%%%%%");
+	// }
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void createCaseA() throws Exception {

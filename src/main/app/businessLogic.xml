@@ -12,16 +12,18 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
         <batch:threading-profile poolExhaustedAction="WAIT"/>
         <batch:process-records>
             <batch:step name="Batch_Step">
-                <logger message="%%%%%%%%%%%% FLOWVAR #[flowVars['sourceSystem']]" level="INFO" doc:name="Logger"/>
+                <logger message="%%%%%%%%%%%% FLOWVAR 1 #[flowVars['sourceSystem']]" level="INFO" doc:name="Logger"/>
             </batch:step>
-            <batch:step name="getCaseInBStep" filter-expression="#['B'.equals(flowVars['sourceSystem']) || payload['ExtId__c'] == null]">
+            <batch:step name="getCaseInBStep" filter-expression="#['B'.equals(flowVars['sourceSystem'])  || payload['ExtId__c'] == null]">
                 <enricher source="#[payload]" target="#[recordVars['caseInTargetInstance']]" doc:name="store Case__c in caseInTargetInstance">
 	            	<sfdc:query-single config-ref="SalesforceB" query="SELECT Id, Subject__c, LastModifiedDate FROM Case__c WHERE Id = '#[payload['ExtId__c']]'" doc:name="query Case__c from B"/>
                 </enricher>
+                <logger message="%%%%%%%%%%%% FLOWVAR 2  #[flowVars['sourceSystem']]" level="INFO" doc:name="Logger"/>
             
             </batch:step>
             <!-- TODO  remove the negation in the last condition of filter expression -->
             <batch:step name="upsertCaseInBStep" filter-expression="#[org.mule.templates.utils.BatchExpressionFilter.evaluate(payload, recordVars['caseInTargetInstance'], flowVars['sourceSystem'], '${sfdc.a.integration.user.id}', 'B')]">
+                <logger message="%%%%%%%%%%%% FLOWVAR 3 #[flowVars['sourceSystem']]" level="INFO" doc:name="Logger"/>
                 <batch:set-record-variable variableName="accountToCreate" value="#[payload.Account]" doc:name="set accountToCreate variable"/>
                 <enricher source="#[payload]" target="#[recordVars['targetAccount']]" doc:name="store subflow result in targetAccount">
                     <flow-ref name="checkTargetAccountSubflow" doc:name="call checkTargetAccount"/>
