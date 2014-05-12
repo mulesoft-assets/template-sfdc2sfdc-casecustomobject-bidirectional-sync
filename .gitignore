@@ -45,4 +45,5 @@ local.properties
 .studio/
 target/
 /bin
+/flows/
 

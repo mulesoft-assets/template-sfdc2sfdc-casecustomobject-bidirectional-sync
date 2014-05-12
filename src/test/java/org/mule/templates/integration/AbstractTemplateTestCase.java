@@ -39,8 +39,8 @@ public class AbstractTemplateTestCase extends FunctionalTestCase {
 	protected static final String POLL_FLOW_B = "triggerSyncFromBFlow";
 	protected static final String TEMPLATE_NAME = "user-broadcast";
 
-	protected final Prober pollProberA = new PollingProber(60000, 1000l);
-	protected final Prober pollProberB = new PollingProber(60000, 1000l);
+	protected final Prober pollProberA = new PollingProber(60000, 10000l);
+	protected final Prober pollProberB = new PollingProber(60000, 10000l);
 	protected final PipelineSynchronizeListener pipelineListenerA = new PipelineSynchronizeListener(POLL_FLOW_A);
 	protected final PipelineSynchronizeListener pipelineListenerB = new PipelineSynchronizeListener(POLL_FLOW_B);
 

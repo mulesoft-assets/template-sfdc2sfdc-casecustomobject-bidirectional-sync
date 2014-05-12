@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="endpoints">
-    <flow SubFlow="false" name="triggerSyncFromAFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="7d7f84a1-49a8-40bb-9ad4-d50c6092a605">
+    <flow SubFlow="false" name="triggerSyncFromAFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="cdd957d7-652b-491b-92af-6b97488042d3">
         <properties>
             <property name="processingStrategy2" value="synchronous"/>
             <property name="initialState" value=""/>
@@ -9,7 +9,7 @@
             <property name="tracking:enable-default-events" value="false"/>
             <property name="auxiliary;index" value="1"/>
             <property name="updated"/>
-            <property-collection name="@http://www.mulesoft.org/schema/mule/ee/tracking/transaction;1526184214"/>
+            <property-collection name="@http://www.mulesoft.org/schema/mule/ee/tracking/transaction;1406743714"/>
         </properties>
         <description></description>
         <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#1">
@@ -35,6 +35,7 @@
                         <property name="auxiliary;index" value="4"/>
                     </property-collection>
                 </properties>
+                <description></description>
                 <compartment entity-id="compartment#1">
                     <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#2">
                         <pattern name="fetch cases from A" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#1">
@@ -58,6 +59,7 @@
 <property name="proxyPassword"/>
 <property name="auxiliary;index" value="5"/>
                             </properties>
+                            <description></description>
                         </pattern>
                     </lane>
                 </compartment>
@@ -68,7 +70,7 @@
                     <property name="variableName" value="sourceSystem"/>
                     <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/core/set-variable"/>
                     <property name="value" value="A"/>
-                    <property name="auxiliary;index" value="7"/>
+                    <property name="auxiliary;index" value="6"/>
                 </properties>
                 <description></description>
             </pattern>
@@ -76,16 +78,15 @@
                 <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
                     <property name="message" value="triggerSyncFromFlow A   sourceSystem:#[flowVars['sourceSystem']]            num of records:   #[flowVars['lastQueryDateA']] #[payload.size()]   "/>
-                    <property name="category" value=""/>
+                    <property name="category"/>
                     <property name="level" value="INFO"/>
-                    <property name="updated"/>
+                    <property name="auxiliary;index" value="7"/>
                 </properties>
                 <description></description>
             </pattern>
-            <pattern name="call " type="http://www.mulesoft.org/schema/mule/batch/execute" entity-id="Batch Execute#1">
+            <pattern name="call  syncCasesBatch" type="http://www.mulesoft.org/schema/mule/batch/execute" entity-id="Batch Execute#1">
                 <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
-                    <property name="updated"/>
                     <property name="name" value="syncCasesBatch"/>
                     <property name="auxiliary;index" value="8"/>
                 </properties>
@@ -93,7 +94,7 @@
             </pattern>
         </lane>
     </flow>
-    <flow SubFlow="false" name="triggerSyncFromBFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="e74a48ba-a22c-4a71-9fc9-7d07aa5debf8">
+    <flow SubFlow="false" name="triggerSyncFromBFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="5be2e94a-c27d-4bf7-8820-b19a6db09b33">
         <properties>
             <property name="processingStrategy2" value="synchronous"/>
             <property name="initialState" value=""/>
@@ -102,7 +103,7 @@
             <property name="tracking:enable-default-events" value="false"/>
             <property name="auxiliary;index" value="9"/>
             <property name="updated"/>
-            <property-collection name="@http://www.mulesoft.org/schema/mule/ee/tracking/transaction;971426036"/>
+            <property-collection name="@http://www.mulesoft.org/schema/mule/ee/tracking/transaction;1288051477"/>
         </properties>
         <description></description>
         <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#3">
@@ -128,7 +129,6 @@
                         <property name="auxiliary;index" value="12"/>
                     </property-collection>
                 </properties>
-                <description></description>
                 <compartment entity-id="compartment#2">
                     <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#4">
                         <pattern name="fetch case__c objects from B" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#2">
@@ -152,7 +152,6 @@
 <property name="proxyPassword"/>
 <property name="auxiliary;index" value="13"/>
                             </properties>
-                            <description></description>
                         </pattern>
                     </lane>
                 </compartment>
@@ -163,7 +162,7 @@
                     <property name="variableName" value="sourceSystem"/>
                     <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/core/set-variable"/>
                     <property name="value" value="B"/>
-                    <property name="auxiliary;index" value="15"/>
+                    <property name="auxiliary;index" value="14"/>
                 </properties>
                 <description></description>
             </pattern>
@@ -171,20 +170,17 @@
                 <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
                     <property name="message" value="triggerSyncFromFlow B   sourceSystem:#[flowVars['sourceSystem']]            num of records:   #[flowVars['lastQueryDateB']] #[payload.size()]"/>
-                    <property name="category" value=""/>
+                    <property name="category"/>
                     <property name="level" value="INFO"/>
-                    <property name="updated"/>
+                    <property name="auxiliary;index" value="15"/>
                 </properties>
-                <description></description>
             </pattern>
-            <pattern name="Batch Execute" type="http://www.mulesoft.org/schema/mule/batch/execute" entity-id="Batch Execute#2">
+            <pattern name="call  syncCasesBatch" type="http://www.mulesoft.org/schema/mule/batch/execute" entity-id="Batch Execute#2">
                 <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
-                    <property name="updated"/>
                     <property name="name" value="syncCasesBatch"/>
                     <property name="auxiliary;index" value="16"/>
                 </properties>
-                <description></description>
             </pattern>
         </lane>
     </flow>
