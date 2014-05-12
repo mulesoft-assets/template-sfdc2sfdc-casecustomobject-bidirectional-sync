@@ -6,13 +6,19 @@ import java.util.Map;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.processor.chain.InterceptingChainLifecycleWrapper;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
 import org.mule.templates.builders.ObjectBuilder;
 
@@ -24,44 +30,79 @@ import com.sforce.soap.partner.SaveResult;
  */
 public class BusinessLogicIntegrationTest extends AbstractTemplateTestCase {
 
-	protected static final int TIMEOUT = 60;
-	protected static final int DELAY = 10000;
 	private static final Logger log = Logger.getLogger(BusinessLogicIntegrationTest.class);
-	private BatchTestHelper helper;
+	protected static final int DELAY = 10000;
+	private static final int TIMEOUT_MILLIS = 60;
+	private static final String ANYPOINT_TEMPLATE_NAME = "user-bidirectional-sync";
+	private static final String A_INBOUND_FLOW_NAME = "triggerSyncFromAFlow";
+	private static final String B_INBOUND_FLOW_NAME = "triggerSyncFromBFlow";
 	Map<String, Object> caseA = null;
 	Map<String, Object> caseB = null;
+	private BatchTestHelper batchTestHelper;
+
+	// Javier
+	private Map<String, Object> userToUpdate;
+	private SubflowInterceptingChainLifecycleWrapper updateUserInAFlow;
+	private SubflowInterceptingChainLifecycleWrapper updateUserInBFlow;
+	private InterceptingChainLifecycleWrapper queryUserFromAFlow;
+	private InterceptingChainLifecycleWrapper queryUserFromBFlow;
 
 	@BeforeClass
-	public static void beforeClass() {
-		System.setProperty("mule.env", "test");
+	public static void beforeTestClass() {
 		System.setProperty("page.size", "1000");
-		System.setProperty("poll.frequencyMillis", "10000");
-		System.setProperty("poll.startDelayMillis", "20000");
-		System.setProperty("watermark.default.expression",
-				"#[groovy: new Date(System.currentTimeMillis() - 10000).format(\"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\", TimeZone.getTimeZone('UTC'))]");
-	}
+		System.setProperty("polling.frequency", "10000");
+		System.clearProperty("watermark.default.expression");
 
-	@AfterClass
-	public static void afterClass() {
-		System.getProperties().remove("mule.env");
-		System.getProperties().remove("page.size");
-		System.getProperties().remove("poll.frequencyMillis");
-		System.getProperties().remove("poll.startDelayMillis");
-		System.getProperties().remove("watermark.default.expression");
+		DateTime now = new DateTime(DateTimeZone.UTC);
+		DateTimeFormatter dateFormat = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		System.setProperty("watermark.default.expression", now.toString(dateFormat));
 	}
 
 	@Before
 	public void setUp() throws Exception {
-		// stopFlowSchedulers(POLL_FLOW_A);
-		// stopFlowSchedulers(POLL_FLOW_B);
-
-		registerListeners();
-		helper = new BatchTestHelper(muleContext);
+		stopAutomaticPollTriggering();
+		getAndInitializeFlows();
+		batchTestHelper = new BatchTestHelper(muleContext);
+		// registerListeners();
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		// deleteCases();
+	}
+
+	private void stopAutomaticPollTriggering() throws MuleException {
+		stopFlowSchedulers(A_INBOUND_FLOW_NAME);
+		stopFlowSchedulers(B_INBOUND_FLOW_NAME);
+	}
+
+	private void getAndInitializeFlows() throws InitialisationException {
+		// // Flow for updating a user in A instance
+		// updateUserInAFlow = getSubFlow("updateUserInAFlow");
+		// updateUserInAFlow.initialise();
+		//
+		// // Flow for updating a user in B instance
+		// updateUserInBFlow = getSubFlow("updateUserInBFlow");
+		// updateUserInBFlow.initialise();
+		//
+		// // Flow for querying the user in A instance
+		// queryUserFromAFlow = getSubFlow("queryUserFromAFlow");
+		// queryUserFromAFlow.initialise();
+		//
+		// // Flow for querying the user in B instance
+		// queryUserFromBFlow = getSubFlow("queryUserFromBFlow");
+		// queryUserFromBFlow.initialise();
+	}
+
+	private void executeWaitAndAssertBatchJob(String flowConstructName)
+			throws Exception {
+
+		// Execute synchronization
+		runSchedulersOnce(flowConstructName);
+
+		// Wait for the batch job execution to finish
+		batchTestHelper.awaitJobTermination(TIMEOUT_MILLIS * 1000, 500);
+		batchTestHelper.assertJobWasSuccessful();
 	}
 
 	@Test
@@ -70,10 +111,8 @@ public class BusinessLogicIntegrationTest extends AbstractTemplateTestCase {
 		System.err.println("mainflow A %%%%%%%%%%%%%%%%%");
 		createCaseA();
 
-		// runSchedulersOnce(POLL_FLOW_A);
-		// waitForPollAToRun();
-		helper.awaitJobTermination(TIMEOUT_SEC * 1000, DELAY);
-		helper.assertJobWasSuccessful();
+		// Execution
+		executeWaitAndAssertBatchJob("syncCasesBatch");
 
 		// System.err.println("case A " + this.caseA);
 		//
@@ -91,12 +130,6 @@ public class BusinessLogicIntegrationTest extends AbstractTemplateTestCase {
 		// System.err.println(o.getClass());
 		// System.err.println(o);
 		// }
-
-		// run Pooler B to sync back
-		// runSchedulersOnce(POLL_FLOW_B);
-		// waitForPollBToRun();
-		helper.awaitJobTermination(TIMEOUT_SEC * 1000, DELAY);
-		helper.assertJobWasSuccessful();
 
 		System.err.println("mainflow A end %%%%%%%%%%%%%%%%%");
 	}
