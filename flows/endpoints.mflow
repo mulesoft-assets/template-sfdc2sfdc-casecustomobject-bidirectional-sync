@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="endpoints">
-    <flow SubFlow="false" name="triggerSyncFromAFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="cdd957d7-652b-491b-92af-6b97488042d3">
+    <flow SubFlow="false" name="triggerSyncFromAFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="746a7a02-6a81-45ef-a56e-a487339feceb">
         <properties>
             <property name="processingStrategy2" value="synchronous"/>
             <property name="initialState" value=""/>
@@ -9,33 +9,32 @@
             <property name="tracking:enable-default-events" value="false"/>
             <property name="auxiliary;index" value="1"/>
             <property name="updated"/>
-            <property-collection name="@http://www.mulesoft.org/schema/mule/ee/tracking/transaction;1406743714"/>
+            <property-collection name="@http://www.mulesoft.org/schema/mule/ee/tracking/transaction;496881784"/>
         </properties>
         <description></description>
         <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#1">
             <graphicalData x="0" y="0" width="0" height="0"/>
             <scope name="Poll" type="org.mule.tooling.ui.modules.core.endpoint.Poller" entity-id="Poll#1">
-                <graphicalData x="0" y="0" width="0" height="0"/>
+                <graphicalData x="21" y="124" width="150" height="130"/>
                 <properties>
-                    <property name="frequency"/>
                     <property name="cron-scheduler"/>
+                    <property name="frequency"/>
                     <property name="fixed-frequency-scheduler"/>
                     <property name="auxiliary;index" value="2"/>
                     <property-collection name="@http://www.mulesoft.org/schema/mule/core/fixed-frequency-scheduler;0">
                         <property name="frequency" value="${polling.frequency}"/>
-                        <property name="auxiliary;wrapIn" value="3"/>
                         <property name="auxiliary;index" value="3"/>
+                        <property name="auxiliary;wrapIn" value="3"/>
                     </property-collection>
                     <property-collection name="@http://www.mulesoft.org/schema/mule/core/watermark;0">
-                        <property name="selector" value="MAX"/>
                         <property name="default-expression" value="${watermark.default.expression}"/>
+                        <property name="selector" value="MAX"/>
                         <property name="selector-expression" value="#[payload.LastModifiedDate]"/>
                         <property name="variable" value="lastQueryDateA"/>
-                        <property name="auxiliary;wrapIn" value="4"/>
                         <property name="auxiliary;index" value="4"/>
+                        <property name="auxiliary;wrapIn" value="4"/>
                     </property-collection>
                 </properties>
-                <description></description>
                 <compartment entity-id="compartment#1">
                     <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#2">
                         <pattern name="fetch cases from A" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#1">
@@ -56,81 +55,75 @@
 <property name="serviceEndpoint"/>
 <property name="accessTokenId"/>
 <property name="config-ref" value="SalesforceA"/>
-<property name="proxyPassword"/>
 <property name="auxiliary;index" value="5"/>
+<property name="proxyPassword"/>
                             </properties>
-                            <description></description>
                         </pattern>
                     </lane>
                 </compartment>
             </scope>
             <pattern name="set sourceSystem to 'A'" type="http://www.mulesoft.org/schema/mule/core/variable-transformer" entity-id="Variable#1">
-                <graphicalData x="0" y="0" width="0" height="0"/>
+                <graphicalData x="231" y="142" width="127" height="94"/>
                 <properties>
                     <property name="variableName" value="sourceSystem"/>
-                    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/core/set-variable"/>
                     <property name="value" value="A"/>
+                    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/core/set-variable"/>
                     <property name="auxiliary;index" value="6"/>
                 </properties>
-                <description></description>
             </pattern>
             <pattern name="log number of records" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#1">
-                <graphicalData x="0" y="0" width="0" height="0"/>
+                <graphicalData x="418" y="142" width="109" height="94"/>
                 <properties>
                     <property name="message" value="triggerSyncFromFlow A   sourceSystem:#[flowVars['sourceSystem']]            num of records:   #[flowVars['lastQueryDateA']] #[payload.size()]   "/>
                     <property name="category"/>
                     <property name="level" value="INFO"/>
                     <property name="auxiliary;index" value="7"/>
                 </properties>
-                <description></description>
             </pattern>
             <pattern name="call  syncCasesBatch" type="http://www.mulesoft.org/schema/mule/batch/execute" entity-id="Batch Execute#1">
-                <graphicalData x="0" y="0" width="0" height="0"/>
+                <graphicalData x="762" y="142" width="116" height="94"/>
                 <properties>
                     <property name="name" value="syncCasesBatch"/>
-                    <property name="auxiliary;index" value="8"/>
+                    <property name="auxiliary;index" value="10"/>
                 </properties>
                 <description></description>
             </pattern>
         </lane>
     </flow>
-    <flow SubFlow="false" name="triggerSyncFromBFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="5be2e94a-c27d-4bf7-8820-b19a6db09b33">
+    <flow SubFlow="false" name="triggerSyncFromBFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="261d7134-4985-4d11-b144-59052aefef2b">
         <properties>
+            <property name="initialState"/>
             <property name="processingStrategy2" value="synchronous"/>
-            <property name="initialState" value=""/>
-            <property name="auxiliary;erased;initialState" value="true"/>
-            <property name="bussinessEventsLabel" value=""/>
-            <property name="tracking:enable-default-events" value="false"/>
-            <property name="auxiliary;index" value="9"/>
-            <property name="updated"/>
-            <property-collection name="@http://www.mulesoft.org/schema/mule/ee/tracking/transaction;1288051477"/>
+            <property name="processingStrategy" value="synchronous"/>
+            <property name="bussinessEventsLabel"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="auxiliary;index" value="11"/>
         </properties>
-        <description></description>
-        <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#3">
+        <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#4">
             <graphicalData x="0" y="0" width="0" height="0"/>
             <scope name="Poll" type="org.mule.tooling.ui.modules.core.endpoint.Poller" entity-id="Poll#2">
                 <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
-                    <property name="frequency"/>
                     <property name="cron-scheduler"/>
+                    <property name="frequency"/>
                     <property name="fixed-frequency-scheduler"/>
-                    <property name="auxiliary;index" value="10"/>
+                    <property name="auxiliary;index" value="12"/>
                     <property-collection name="@http://www.mulesoft.org/schema/mule/core/fixed-frequency-scheduler;0">
                         <property name="frequency" value="${polling.frequency}"/>
-                        <property name="auxiliary;wrapIn" value="11"/>
-                        <property name="auxiliary;index" value="11"/>
+                        <property name="auxiliary;index" value="13"/>
+                        <property name="auxiliary;wrapIn" value="13"/>
                     </property-collection>
                     <property-collection name="@http://www.mulesoft.org/schema/mule/core/watermark;0">
-                        <property name="selector" value="MAX"/>
                         <property name="default-expression" value="${watermark.default.expression}"/>
+                        <property name="selector" value="MAX"/>
                         <property name="selector-expression" value="#[payload.LastModifiedDate]"/>
                         <property name="variable" value="lastQueryDateB"/>
-                        <property name="auxiliary;wrapIn" value="12"/>
-                        <property name="auxiliary;index" value="12"/>
+                        <property name="auxiliary;index" value="14"/>
+                        <property name="auxiliary;wrapIn" value="14"/>
                     </property-collection>
                 </properties>
-                <compartment entity-id="compartment#2">
-                    <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#4">
+                <compartment entity-id="compartment#3">
+                    <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#5">
                         <pattern name="fetch case__c objects from B" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#2">
                             <graphicalData x="0" y="0" width="0" height="0"/>
                             <properties>
@@ -149,8 +142,8 @@
 <property name="serviceEndpoint"/>
 <property name="accessTokenId"/>
 <property name="config-ref" value="SalesforceB"/>
+<property name="auxiliary;index" value="15"/>
 <property name="proxyPassword"/>
-<property name="auxiliary;index" value="13"/>
                             </properties>
                         </pattern>
                     </lane>
@@ -160,27 +153,27 @@
                 <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
                     <property name="variableName" value="sourceSystem"/>
-                    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/core/set-variable"/>
                     <property name="value" value="B"/>
-                    <property name="auxiliary;index" value="14"/>
+                    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/core/set-variable"/>
+                    <property name="auxiliary;index" value="16"/>
                 </properties>
-                <description></description>
             </pattern>
-            <pattern name="log number of records" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#2">
+            <pattern name="log number of records" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#3">
                 <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
                     <property name="message" value="triggerSyncFromFlow B   sourceSystem:#[flowVars['sourceSystem']]            num of records:   #[flowVars['lastQueryDateB']] #[payload.size()]"/>
                     <property name="category"/>
                     <property name="level" value="INFO"/>
-                    <property name="auxiliary;index" value="15"/>
+                    <property name="auxiliary;index" value="17"/>
                 </properties>
             </pattern>
             <pattern name="call  syncCasesBatch" type="http://www.mulesoft.org/schema/mule/batch/execute" entity-id="Batch Execute#2">
                 <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
                     <property name="name" value="syncCasesBatch"/>
-                    <property name="auxiliary;index" value="16"/>
+                    <property name="auxiliary;index" value="18"/>
                 </properties>
+                <description></description>
             </pattern>
         </lane>
     </flow>

@@ -18,6 +18,7 @@ WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateA']] ORDER BY LastModifiedD
 
         <set-variable variableName="sourceSystem" value="A" doc:name="set sourceSystem to 'A'"/>
         <logger message="triggerSyncFromFlow A   sourceSystem:#[flowVars['sourceSystem']]            num of records:   #[flowVars['lastQueryDateA']] #[payload.size()]   " level="INFO" doc:name="log number of records"/>
+
         <batch:execute name="syncCasesBatch" doc:name="call  syncCasesBatch"/>
     </flow>
     <flow name="triggerSyncFromBFlow" doc:name="triggerSyncFromBFlow" processingStrategy="synchronous">
