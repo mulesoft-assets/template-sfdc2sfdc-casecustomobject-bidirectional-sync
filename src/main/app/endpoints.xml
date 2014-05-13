@@ -20,6 +20,7 @@ WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateA']] ORDER BY LastModifiedD
         <logger message="triggerSyncFromFlow A   sourceSystem:#[flowVars['sourceSystem']]            num of records:   #[flowVars['lastQueryDateA']] #[payload.size()]   " level="INFO" doc:name="log number of records"/>
 
         <batch:execute name="syncCasesBatch" doc:name="call  syncCasesBatch"/>
+        <exception-strategy ref="Choice_Exception_Strategy" doc:name="Reference Exception Strategy"/>
     </flow>
     <flow name="triggerSyncFromBFlow" doc:name="triggerSyncFromBFlow" processingStrategy="synchronous">
         <poll doc:name="Poll">
@@ -34,5 +35,6 @@ WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateB']] ORDER BY LastModifiedD
         <set-variable variableName="sourceSystem" value="B" doc:name="set sourceSystem to 'B'"/>
         <logger message="triggerSyncFromFlow B   sourceSystem:#[flowVars['sourceSystem']]            num of records:   #[flowVars['lastQueryDateB']] #[payload.size()]" level="INFO" doc:name="log number of records"/>
         <batch:execute name="syncCasesBatch" doc:name="call  syncCasesBatch"/>
+        <exception-strategy ref="Choice_Exception_Strategy" doc:name="Reference Exception Strategy"/>
     </flow>
 </mule>
