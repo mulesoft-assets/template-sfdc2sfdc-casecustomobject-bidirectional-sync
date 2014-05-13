@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="test-flows">
-    <flow SubFlow="true" name="createCaseInAFlow" type="http://www.mulesoft.org/schema/mule/core/subflow" entity-id="2ce997fc-2314-4bb2-9ffd-a772cd44bc93">
+    <flow SubFlow="true" name="createCaseInAFlow" type="http://www.mulesoft.org/schema/mule/core/subflow" entity-id="3c67283a-a10e-4cd6-8754-a1328bb3676a">
         <properties>
             <property name="initialState"/>
             <property name="processingStrategy2"/>
@@ -9,7 +9,6 @@
             <property name="tracking:enable-default-events"/>
             <property name="auxiliary;index" value="1"/>
         </properties>
-        <description></description>
         <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#1">
             <graphicalData x="0" y="0" width="0" height="0"/>
             <pattern name="Salesforce" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#1">
@@ -40,7 +39,7 @@
             </pattern>
         </lane>
     </flow>
-    <flow SubFlow="true" name="createCaseInBFlow" type="http://www.mulesoft.org/schema/mule/core/subflow" entity-id="6d25ee5f-0f47-441d-a174-ec35caa0109e">
+    <flow SubFlow="true" name="createCaseInBFlow" type="http://www.mulesoft.org/schema/mule/core/subflow" entity-id="32e4a89f-cea3-4228-8ec0-ca8e05b7baad">
         <properties>
             <property name="initialState"/>
             <property name="processingStrategy2"/>
@@ -49,7 +48,6 @@
             <property name="tracking:enable-default-events"/>
             <property name="auxiliary;index" value="4"/>
         </properties>
-        <description></description>
         <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#2">
             <graphicalData x="0" y="0" width="0" height="0"/>
             <pattern name="Salesforce" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#2">
@@ -80,7 +78,7 @@
             </pattern>
         </lane>
     </flow>
-    <flow SubFlow="true" name="queryCaseInAFlow" type="http://www.mulesoft.org/schema/mule/core/subflow" entity-id="376870b8-dcf2-4aca-82b4-30044d0e083d">
+    <flow SubFlow="true" name="queryCaseInAFlow" type="http://www.mulesoft.org/schema/mule/core/subflow" entity-id="b4e946bd-4746-4977-9964-db26aca84415">
         <properties>
             <property name="initialState"/>
             <property name="processingStrategy2"/>
@@ -89,7 +87,6 @@
             <property name="tracking:enable-default-events"/>
             <property name="auxiliary;index" value="7"/>
         </properties>
-        <description></description>
         <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#3">
             <graphicalData x="0" y="0" width="0" height="0"/>
             <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#1">
@@ -100,28 +97,32 @@
                     <property name="level" value="INFO"/>
                     <property name="auxiliary;index" value="8"/>
                 </properties>
+                <description></description>
             </pattern>
             <pattern name="Salesforce" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#3">
                 <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
-                    <property name=""/>
-                    <property name="fetchSize"/>
-                    <property name="proxyUsername"/>
-                    <property name="securityToken"/>
-                    <property name="proxyHost"/>
-                    <property name="query" value="SELECT Id, Subject, ExtId__c, LastModifiedDate FROM Case WHERE ExtId__c = '#[payload['ExtId__c']]'"/>
+                    <property name="" value=""/>
+                    <property name="proxyUsername" value=""/>
+                    <property name="fetchSize" value=""/>
+                    <property name="securityToken" value=""/>
+                    <property name="proxyHost" value=""/>
+                    <property name="query" value="SELECT Id, Subject, ExtId__c, LastModifiedDate FROM Case WHERE Id = '#[payload['Id']]'"/>
                     <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/sfdc/query"/>
-                    <property name="proxyPort"/>
-                    <property name="password"/>
-                    <property name="url"/>
-                    <property name="username"/>
-                    <property name="sessionId"/>
-                    <property name="serviceEndpoint"/>
-                    <property name="accessTokenId"/>
+                    <property name="proxyPort" value="80"/>
+                    <property name="password" value=""/>
+                    <property name="url" value=""/>
+                    <property name="username" value=""/>
+                    <property name="updated"/>
+                    <property name="sessionId" value=""/>
+                    <property name="serviceEndpoint" value=""/>
+                    <property name="accessTokenId" value=""/>
                     <property name="config-ref" value="SalesforceA"/>
                     <property name="auxiliary;index" value="9"/>
-                    <property name="proxyPassword"/>
+                    <property name="proxyPassword" value=""/>
+                    <property name="auxiliary;metametadataStrategy" value="no-op-metadata-strategy"/>
                 </properties>
+                <description></description>
             </pattern>
             <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#2">
                 <graphicalData x="0" y="0" width="0" height="0"/>
@@ -134,7 +135,7 @@
             </pattern>
         </lane>
     </flow>
-    <flow SubFlow="true" name="queryCaseInBFlow" type="http://www.mulesoft.org/schema/mule/core/subflow" entity-id="4d56df2a-922e-4840-a4cf-61303aa03972">
+    <flow SubFlow="true" name="queryCaseInBFlow" type="http://www.mulesoft.org/schema/mule/core/subflow" entity-id="3c07b955-26ad-4c36-95ef-74338c45b70d">
         <properties>
             <property name="initialState"/>
             <property name="processingStrategy2"/>
@@ -143,7 +144,6 @@
             <property name="tracking:enable-default-events"/>
             <property name="auxiliary;index" value="11"/>
         </properties>
-        <description></description>
         <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#4">
             <graphicalData x="0" y="0" width="0" height="0"/>
             <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#3">
@@ -158,27 +158,24 @@
             <pattern name="Salesforce" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#4">
                 <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
-                    <property name="" value=""/>
-                    <property name="proxyUsername" value=""/>
-                    <property name="fetchSize" value=""/>
-                    <property name="securityToken" value=""/>
-                    <property name="proxyHost" value=""/>
+                    <property name=""/>
+                    <property name="fetchSize"/>
+                    <property name="proxyUsername"/>
+                    <property name="securityToken"/>
+                    <property name="proxyHost"/>
                     <property name="query" value="SELECT Id, Subject__c, LastModifiedDate, CaseId__c  FROM Case__c WHERE CaseId__c = '#[payload['CaseId__c']]'"/>
                     <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/sfdc/query"/>
-                    <property name="proxyPort" value="80"/>
-                    <property name="password" value=""/>
-                    <property name="url" value=""/>
-                    <property name="username" value=""/>
-                    <property name="updated"/>
-                    <property name="sessionId" value=""/>
-                    <property name="serviceEndpoint" value=""/>
-                    <property name="accessTokenId" value=""/>
+                    <property name="proxyPort"/>
+                    <property name="password"/>
+                    <property name="url"/>
+                    <property name="username"/>
+                    <property name="sessionId"/>
+                    <property name="serviceEndpoint"/>
+                    <property name="accessTokenId"/>
                     <property name="config-ref" value="SalesforceB"/>
                     <property name="auxiliary;index" value="13"/>
-                    <property name="proxyPassword" value=""/>
-                    <property name="auxiliary;metametadataStrategy" value="no-op-metadata-strategy"/>
+                    <property name="proxyPassword"/>
                 </properties>
-                <description></description>
             </pattern>
             <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#4">
                 <graphicalData x="0" y="0" width="0" height="0"/>
@@ -191,7 +188,7 @@
             </pattern>
         </lane>
     </flow>
-    <flow SubFlow="true" name="deleteCaseFromAFlow" type="http://www.mulesoft.org/schema/mule/core/subflow" entity-id="3ea5c73d-78db-4b66-85eb-cefc1f3062e5">
+    <flow SubFlow="true" name="deleteCaseFromAFlow" type="http://www.mulesoft.org/schema/mule/core/subflow" entity-id="4b8973da-293b-4f10-bffd-7ce9d0ee711f">
         <properties>
             <property name="initialState"/>
             <property name="processingStrategy2"/>
@@ -200,7 +197,6 @@
             <property name="tracking:enable-default-events"/>
             <property name="auxiliary;index" value="15"/>
         </properties>
-        <description></description>
         <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#5">
             <graphicalData x="0" y="0" width="0" height="0"/>
             <pattern name="Salesforce" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#5">
@@ -230,7 +226,7 @@
             </pattern>
         </lane>
     </flow>
-    <flow SubFlow="true" name="deleteCaseFromBFlow" type="http://www.mulesoft.org/schema/mule/core/subflow" entity-id="44a84aaf-6374-4930-9bed-a54f0a2dbbc9">
+    <flow SubFlow="true" name="deleteCaseFromBFlow" type="http://www.mulesoft.org/schema/mule/core/subflow" entity-id="22bffa3c-2145-4eff-8adb-2f90c8d764fb">
         <properties>
             <property name="initialState"/>
             <property name="processingStrategy2"/>
@@ -239,7 +235,6 @@
             <property name="tracking:enable-default-events"/>
             <property name="auxiliary;index" value="18"/>
         </properties>
-        <description></description>
         <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#6">
             <graphicalData x="0" y="0" width="0" height="0"/>
             <pattern name="Salesforce" type="http://www.mulesoft.org/schema/mule/sfdc/sfdc-connector" entity-id="Salesforce#6">

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="endpoints">
-    <flow SubFlow="false" name="triggerSyncFromAFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="2e3ada6e-034b-424a-9521-6a02047a4a56">
+    <flow SubFlow="false" name="triggerSyncFromAFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="374f256b-a6ad-4b65-afd5-18e0e4cdd96c">
         <properties>
             <property name="initialState"/>
             <property name="processingStrategy2" value="synchronous"/>
@@ -12,7 +12,7 @@
         <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#1">
             <graphicalData x="0" y="0" width="0" height="0"/>
             <scope name="Poll" type="org.mule.tooling.ui.modules.core.endpoint.Poller" entity-id="Poll#1">
-                <graphicalData x="21" y="198" width="150" height="130"/>
+                <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
                     <property name="cron-scheduler"/>
                     <property name="frequency"/>
@@ -59,15 +59,8 @@
                     </lane>
                 </compartment>
             </scope>
-            <pattern name="Reference Exception Strategy" type="http://www.mulesoft.org/schema/mule/core/exception-strategy" entity-id="10a2d990-68de-4991-92de-449e7bd449aa">
-                <properties>
-                    <property name="ref" value="Choice_Exception_Strategy"/>
-                    <property name="updated"/>
-                </properties>
-                <description></description>
-            </pattern>
             <pattern name="set sourceSystem to 'A'" type="http://www.mulesoft.org/schema/mule/core/variable-transformer" entity-id="Variable#1">
-                <graphicalData x="231" y="216" width="127" height="94"/>
+                <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
                     <property name="variableName" value="sourceSystem"/>
                     <property name="value" value="A"/>
@@ -76,7 +69,7 @@
                 </properties>
             </pattern>
             <pattern name="log number of records" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#1">
-                <graphicalData x="418" y="216" width="109" height="94"/>
+                <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
                     <property name="message" value="triggerSyncFromFlow A   sourceSystem:#[flowVars['sourceSystem']]            num of records:   #[flowVars['lastQueryDateA']] #[payload.size()]   "/>
                     <property name="category"/>
@@ -85,44 +78,50 @@
                 </properties>
             </pattern>
             <pattern name="call  syncCasesBatch" type="http://www.mulesoft.org/schema/mule/batch/execute" entity-id="Batch Execute#1">
-                <graphicalData x="587" y="216" width="116" height="94"/>
+                <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
                     <property name="name" value="syncCasesBatch"/>
                     <property name="auxiliary;index" value="8"/>
                 </properties>
             </pattern>
+            <pattern name="Reference Exception Strategy" type="http://www.mulesoft.org/schema/mule/core/exception-strategy" entity-id="Reference Exception Strategy#1">
+                <properties>
+                    <property name="ref" value="Choice_Exception_Strategy"/>
+                    <property name="auxiliary;index" value="9"/>
+                </properties>
+            </pattern>
         </lane>
     </flow>
-    <flow SubFlow="false" name="triggerSyncFromBFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="480b3a18-b4b3-419f-bc26-a333853ddbc6">
+    <flow SubFlow="false" name="triggerSyncFromBFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="4ab1b95e-4d42-4c54-97bf-c011a8fbbf50">
         <properties>
             <property name="initialState"/>
             <property name="processingStrategy2" value="synchronous"/>
             <property name="processingStrategy" value="synchronous"/>
             <property name="bussinessEventsLabel"/>
             <property name="tracking:enable-default-events"/>
-            <property name="auxiliary;index" value="9"/>
+            <property name="auxiliary;index" value="10"/>
         </properties>
         <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#3">
             <graphicalData x="0" y="0" width="0" height="0"/>
             <scope name="Poll" type="org.mule.tooling.ui.modules.core.endpoint.Poller" entity-id="Poll#2">
-                <graphicalData x="21" y="450" width="139" height="130"/>
+                <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
                     <property name="cron-scheduler"/>
                     <property name="frequency"/>
                     <property name="fixed-frequency-scheduler"/>
-                    <property name="auxiliary;index" value="10"/>
+                    <property name="auxiliary;index" value="11"/>
                     <property-collection name="@http://www.mulesoft.org/schema/mule/core/fixed-frequency-scheduler;0">
                         <property name="frequency" value="${polling.frequency}"/>
-                        <property name="auxiliary;index" value="11"/>
-                        <property name="auxiliary;wrapIn" value="11"/>
+                        <property name="auxiliary;index" value="12"/>
+                        <property name="auxiliary;wrapIn" value="12"/>
                     </property-collection>
                     <property-collection name="@http://www.mulesoft.org/schema/mule/core/watermark;0">
                         <property name="default-expression" value="${watermark.default.expression}"/>
                         <property name="selector" value="MAX"/>
                         <property name="selector-expression" value="#[payload.LastModifiedDate]"/>
                         <property name="variable" value="lastQueryDateB"/>
-                        <property name="auxiliary;index" value="12"/>
-                        <property name="auxiliary;wrapIn" value="12"/>
+                        <property name="auxiliary;index" value="13"/>
+                        <property name="auxiliary;wrapIn" value="13"/>
                     </property-collection>
                 </properties>
                 <compartment entity-id="compartment#2">
@@ -145,43 +144,42 @@
 <property name="serviceEndpoint"/>
 <property name="accessTokenId"/>
 <property name="config-ref" value="SalesforceB"/>
-<property name="auxiliary;index" value="13"/>
+<property name="auxiliary;index" value="14"/>
 <property name="proxyPassword"/>
                             </properties>
                         </pattern>
                     </lane>
                 </compartment>
             </scope>
-            <pattern name="Reference Exception Strategy" type="http://www.mulesoft.org/schema/mule/core/exception-strategy" entity-id="7583b6f4-83d0-440a-a707-8aa42ee3ff00">
-                <properties>
-                    <property name="ref" value="Choice_Exception_Strategy"/>
-                    <property name="updated"/>
-                </properties>
-                <description></description>
-            </pattern>
             <pattern name="set sourceSystem to 'B'" type="http://www.mulesoft.org/schema/mule/core/variable-transformer" entity-id="Variable#2">
-                <graphicalData x="220" y="468" width="127" height="94"/>
+                <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
                     <property name="variableName" value="sourceSystem"/>
                     <property name="value" value="B"/>
                     <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/core/set-variable"/>
-                    <property name="auxiliary;index" value="14"/>
+                    <property name="auxiliary;index" value="15"/>
                 </properties>
             </pattern>
             <pattern name="log number of records" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#2">
-                <graphicalData x="407" y="468" width="109" height="94"/>
+                <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
                     <property name="message" value="triggerSyncFromFlow B   sourceSystem:#[flowVars['sourceSystem']]            num of records:   #[flowVars['lastQueryDateB']] #[payload.size()]"/>
                     <property name="category"/>
                     <property name="level" value="INFO"/>
-                    <property name="auxiliary;index" value="15"/>
+                    <property name="auxiliary;index" value="16"/>
                 </properties>
             </pattern>
             <pattern name="call  syncCasesBatch" type="http://www.mulesoft.org/schema/mule/batch/execute" entity-id="Batch Execute#2">
-                <graphicalData x="576" y="468" width="116" height="94"/>
+                <graphicalData x="0" y="0" width="0" height="0"/>
                 <properties>
                     <property name="name" value="syncCasesBatch"/>
-                    <property name="auxiliary;index" value="16"/>
+                    <property name="auxiliary;index" value="17"/>
+                </properties>
+            </pattern>
+            <pattern name="Reference Exception Strategy" type="http://www.mulesoft.org/schema/mule/core/exception-strategy" entity-id="Reference Exception Strategy#2">
+                <properties>
+                    <property name="ref" value="Choice_Exception_Strategy"/>
+                    <property name="auxiliary;index" value="18"/>
                 </properties>
             </pattern>
         </lane>

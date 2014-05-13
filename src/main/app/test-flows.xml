@@ -22,7 +22,7 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
     </sub-flow>
     <sub-flow name="queryCaseInAFlow" doc:name="queryCaseInAFlow">
         <logger message="AAAA QUERY #[payload]" level="INFO" doc:name="Logger"/>
-        <sfdc:query config-ref="SalesforceA" query="SELECT Id, Subject, ExtId__c, LastModifiedDate FROM Case WHERE ExtId__c = '#[payload['ExtId__c']]'" doc:name="Salesforce"/>
+        <sfdc:query config-ref="SalesforceA" query="SELECT Id, Subject, ExtId__c, LastModifiedDate FROM Case WHERE Id = '#[payload['Id']]'" doc:name="Salesforce"/>
         <logger message="AAAA RESULT QUERY #[payload]" level="INFO" doc:name="Logger"/>
     </sub-flow>
     <sub-flow name="queryCaseInBFlow" doc:name="queryCaseInBFlow">

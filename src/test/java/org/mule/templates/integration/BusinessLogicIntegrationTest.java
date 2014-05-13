@@ -1,20 +1,27 @@
 package org.mule.templates.integration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.processor.chain.InterceptingChainLifecycleWrapper;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
 import org.mule.templates.builders.ObjectBuilder;
+import org.mule.transport.NullPayload;
 
 import com.mulesoft.module.batch.BatchTestHelper;
 import com.sforce.soap.partner.SaveResult;
@@ -24,87 +31,89 @@ import com.sforce.soap.partner.SaveResult;
  */
 public class BusinessLogicIntegrationTest extends AbstractTemplateTestCase {
 
-	protected static final int TIMEOUT = 60;
-	protected static final int DELAY = 500;
 	private static final Logger log = Logger.getLogger(BusinessLogicIntegrationTest.class);
-	private BatchTestHelper helper;
+
+	private static final String A_INBOUND_FLOW_NAME = "triggerSyncFromAFlow";
+	private static final String B_INBOUND_FLOW_NAME = "triggerSyncFromBFlow";
+	private static final int TIMEOUT_MILLIS = 60;
+
+	private BatchTestHelper batchTestHelper;
+
 	Map<String, Object> caseA = null;
 	Map<String, Object> caseB = null;
 
 	@BeforeClass
-	public static void beforeClass() {
+	public static void beforeTestClass() {
 		System.setProperty("mule.env", "test");
 		System.setProperty("page.size", "1000");
-		System.setProperty("poll.frequencyMillis", "10000");
-		System.setProperty("poll.startDelayMillis", "20000");
-		System.setProperty("watermark.default.expression",
-				"#[groovy: new Date(System.currentTimeMillis()).format(\"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\", TimeZone.getTimeZone('UTC'))]");
-	}
 
-	@AfterClass
-	public static void afterClass() {
-		System.getProperties().remove("mule.env");
-		System.getProperties().remove("page.size");
-		System.getProperties().remove("poll.frequencyMillis");
-		System.getProperties().remove("poll.startDelayMillis");
-		System.getProperties().remove("watermark.default.expression");
+		// Set polling frequency to 10 seconds
+		System.setProperty("polling.frequency", "10000");
+
+		// Set default water-mark expression to current time
+		System.clearProperty("watermark.default.expression");
+		DateTime now = new DateTime(DateTimeZone.UTC);
+		// now = now.minus(1000 * 60 * 10);
+		DateTimeFormatter dateFormat = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		System.setProperty("watermark.default.expression", now.toString(dateFormat));
 	}
 
 	@Before
 	public void setUp() throws Exception {
-		stopFlowSchedulers(POLL_FLOW_A);
-		stopFlowSchedulers(POLL_FLOW_B);
-
-		registerListeners();
-		helper = new BatchTestHelper(muleContext);
-		createCaseA();
+		stopAutomaticPollTriggering();
+		batchTestHelper = new BatchTestHelper(muleContext);
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		deleteCases();
+	}
+
+	private void stopAutomaticPollTriggering() throws MuleException {
+		stopFlowSchedulers(A_INBOUND_FLOW_NAME);
+		stopFlowSchedulers(B_INBOUND_FLOW_NAME);
+	}
+
+	private void executeWaitAndAssertBatchJob(String flowConstructName) throws Exception {
+		// Execute synchronization
+		runSchedulersOnce(flowConstructName);
+
+		// Wait for the batch job execution to finish
+		batchTestHelper.awaitJobTermination(TIMEOUT_MILLIS * 1000, 500);
+		batchTestHelper.assertJobWasSuccessful();
+	}
+
+	protected Map<String, Object> invokeRetrieveFlow(InterceptingChainLifecycleWrapper flow, Map<String, Object> payload) throws Exception {
+		MuleEvent event = flow.process(getTestEvent(payload, MessageExchangePattern.REQUEST_RESPONSE));
+		Object resultPayload = event.getMessage().getPayload();
+		return resultPayload instanceof NullPayload ? null : (Map<String, Object>) resultPayload;
 	}
 
 	@Test
 	@SuppressWarnings({ "unchecked" })
 	public void testPollA() throws Exception {
-		System.err.println("mainflow A %%%%%%%%%%%%%%%%%");
+		System.err.println("mainflow A");
+		createCaseA();
 
-		runSchedulersOnce(POLL_FLOW_A);
-		waitForPollAToRun();
-		helper.awaitJobTermination(TIMEOUT_SEC * 1000, DELAY);
-		helper.assertJobWasSuccessful();
+		// Execution
+		executeWaitAndAssertBatchJob(A_INBOUND_FLOW_NAME);
+		Thread.sleep(10000);
 
-		// System.err.println("case A " + this.caseA);
-		//
-		// // check the data in B
-		// SubflowInterceptingChainLifecycleWrapper subflow = getSubFlow("queryCaseInBFlow");
-		// subflow.initialise();
-		// Map<String, Object> caseB = new HashMap<String, Object>();
-		// caseB.put("CaseId__c", this.caseA.get("Id"));
-		// System.err.println("quering B where CaseId__c = " + caseB.get("CaseId__c"));
-		// MuleEvent event = subflow.process(getTestEvent(caseB, MessageExchangePattern.REQUEST_RESPONSE));
-		// ConsumerIterator<Object> result = (ConsumerIterator<Object>) event.getMessage().getPayload();
-		// System.err.println("queryCaseInBFlow result: ");
-		// while (result.hasNext()) {
-		// Object o = result.next();
-		// System.err.println(o.getClass());
-		// System.err.println(o);
-		// }
+		executeWaitAndAssertBatchJob(B_INBOUND_FLOW_NAME);
+		Thread.sleep(10000);
 
-		// run Pooler B to sync back
-		// runSchedulersOnce(POLL_FLOW_B);
-		// waitForPollBToRun();
-		// helper.awaitJobTermination(TIMEOUT_SEC * 1000, DELAY);
-		// helper.assertJobWasSuccessful();
+		// check the data in A
+		SubflowInterceptingChainLifecycleWrapper subflow = getSubFlow("queryCaseInAFlow");
+		subflow.initialise();
+		Map<String, Object> caseA = new HashMap<String, Object>();
+		caseA.put("Id", this.caseB.get("Id"));
 
-		System.err.println("mainflow A end %%%%%%%%%%%%%%%%%");
+		// deleteCases();
+		System.err.println("mainflow A end");
 	}
 
 	// @Test
 	// @SuppressWarnings({ "unchecked" })
 	// public void testPollB() throws Exception {
-	// System.err.println("mainflow B %%%%%%%%%%%%%%%%%");
 	// createCaseB();
 	//
 	// // run Pooler B
@@ -129,7 +138,6 @@ public class BusinessLogicIntegrationTest extends AbstractTemplateTestCase {
 	// System.err.println(o);
 	// }
 	//
-	// System.err.println("mainflow B end%%%%%%%%%%%%%%%%%");
 	// }
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
