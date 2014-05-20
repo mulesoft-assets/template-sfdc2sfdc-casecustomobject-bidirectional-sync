@@ -7,7 +7,7 @@ http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfd
 http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
     <flow name="triggerSyncFromAFlow" doc:name="triggerSyncFromAFlow" processingStrategy="synchronous">
         <poll doc:name="Poll">
-            <fixed-frequency-scheduler frequency="${polling.frequency}"/>
+            <fixed-frequency-scheduler frequency="${polling.frequency}" startDelay="1000"/>
             <watermark variable="lastQueryDateA" default-expression="${watermark.default.expression}" selector="MAX" selector-expression="#[payload.LastModifiedDate]"/>
             <sfdc:query config-ref="SalesforceA" query="dsql:SELECT Id,Description,Subject,LastModifiedDate,LastModifiedById,Origin,Priority,Status, ExtId__c,
 ContactId, Contact.FirstName, Contact.LastName, Contact.Email, AccountId, Account.Name
@@ -17,14 +17,11 @@ WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateA']] ORDER BY LastModifiedD
         </poll>
 
         <set-variable variableName="sourceSystem" value="A" doc:name="set sourceSystem to 'A'"/>
-        <logger message="triggerSyncFromFlow A   sourceSystem:#[flowVars['sourceSystem']]            num of records:   #[flowVars['lastQueryDateA']] #[payload.size()]   " level="INFO" doc:name="log number of records"/>
-
-        <batch:execute name="syncCasesBatch" doc:name="call  syncCasesBatch"/>
-        <exception-strategy ref="Choice_Exception_Strategy" doc:name="Reference Exception Strategy"/>
+        <batch:execute name="syncCasesBatch" doc:name="call syncCasesBatch"/>
     </flow>
     <flow name="triggerSyncFromBFlow" doc:name="triggerSyncFromBFlow" processingStrategy="synchronous">
         <poll doc:name="Poll">
-            <fixed-frequency-scheduler frequency="${polling.frequency}"/>
+            <fixed-frequency-scheduler frequency="${polling.frequency}" startDelay="1000" />
             <watermark variable="lastQueryDateB" default-expression="${watermark.default.expression}" selector="MAX" selector-expression="#[payload.LastModifiedDate]"/>
             <sfdc:query config-ref="SalesforceB" query="dsql:SELECT Id,Description__c,Subject__c,LastModifiedDate,LastModifiedById,Origin__c,Priority__c,Status__c, CaseId__c,
 Contact__c, Contact__r.FirstName, Contact__r.LastName, Contact__r.Email, Account__c,Account__r.Name
@@ -33,8 +30,7 @@ WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateB']] ORDER BY LastModifiedD
         </poll>
 
         <set-variable variableName="sourceSystem" value="B" doc:name="set sourceSystem to 'B'"/>
-        <logger message="triggerSyncFromFlow B   sourceSystem:#[flowVars['sourceSystem']]            num of records:   #[flowVars['lastQueryDateB']] #[payload.size()]" level="INFO" doc:name="log number of records"/>
-        <batch:execute name="syncCasesBatch" doc:name="call  syncCasesBatch"/>
-        <exception-strategy ref="Choice_Exception_Strategy" doc:name="Reference Exception Strategy"/>
+
+        <batch:execute name="syncCasesBatch" doc:name="call syncCasesBatch"/>
     </flow>
 </mule>
