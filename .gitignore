@@ -35,7 +35,7 @@ local.properties
 
 # CDT-specific
 .cproject
-
+target/
 # PDT-specific
 .buildpath
 
@@ -43,7 +43,23 @@ local.properties
 # Studio-specific #
 # --------------- #
 .studio/
-target/
-bin
 flows/
+target/
+**/*.mflow
 
+# --------------- #
+# Mule-specific #
+# --------------- #
+.mule/
+
+# --------------------------------------- #
+# Test credentials to be use locally only #
+# --------------------------------------- #
+src/test/resources/mule.test.properties
+
+# ------------- #
+# Idea specific #
+# ------------- #
+.idea
+**/*.iml
+**/.*.un~
