@@ -11,17 +11,14 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
     <batch:job name="syncCasesBatch">
         <batch:threading-profile poolExhaustedAction="WAIT"/>
         <batch:process-records>
-            <batch:step name="Batch_Step">
-                <logger message="AAAAAAAAAAAAAAAAA FLOWVAR 1 #[flowVars['sourceSystem']]" level="INFO" doc:name="Logger"/>
-            </batch:step>
-            <batch:step name="getCaseInBStep" filter-expression="#['B'.equals(flowVars['sourceSystem'])  || payload['ExtId__c'] == null]">
+            <batch:step name="getCaseInBStep" accept-expression="'A'.equals(flowVars['sourceSystem']) &amp;&amp; payload['ExtId__c'] != null">
                 <enricher source="#[payload]" target="#[recordVars['caseInTargetInstance']]" doc:name="store Case__c in caseInTargetInstance">
 	            	<sfdc:query-single config-ref="SalesforceB" query="SELECT Id, Subject__c, LastModifiedDate FROM Case__c WHERE Id = '#[payload['ExtId__c']]'" doc:name="query Case__c from B"/>
                 </enricher>
             
             </batch:step>
             <!-- TODO  remove the negation in the last condition of filter expression -->
-            <batch:step name="upsertCaseInBStep" filter-expression="#[org.mule.templates.utils.BatchExpressionFilter.evaluate(payload, recordVars['caseInTargetInstance'], flowVars['sourceSystem'], '${sfdc.a.integration.user.id}', 'B')]">
+            <batch:step name="upsertCaseInBStep" accept-expression="!org.mule.templates.utils.BatchExpressionFilter.evaluate(payload, recordVars['caseInTargetInstance'], flowVars['sourceSystem'], '${sfdc.a.integration.user.id}', 'B')">
                 <batch:set-record-variable variableName="accountToCreate" value="#[payload.Account]" doc:name="set accountToCreate variable"/>
                 <enricher source="#[payload]" target="#[recordVars['targetAccount']]" doc:name="store subflow result in targetAccount">
                     <flow-ref name="checkTargetAccountSubflow" doc:name="call checkTargetAccount"/>
@@ -51,12 +48,12 @@ if(!(recordVars['targetAccount'] is NullPayload)){
 
             </batch:step>
             <!-- TODO  remove the negation in the last condition of filter expression -->
-            <batch:step name="getCaseInAStep" filter-expression="#['A'.equals(flowVars['sourceSystem'])  || payload['CaseId__c'] == null]">
+            <batch:step name="getCaseInAStep" accept-expression="'B'.equals(flowVars['sourceSystem']) &amp;&amp; payload['CaseId__c'] != null">
                 <enricher source="#[payload]" target="#[recordVars['caseInTargetInstance']]" doc:name="store Case in caseInTargetInstance">
                     <sfdc:query-single config-ref="SalesforceA" query="SELECT Id, Subject, LastModifiedDate FROM Case WHERE Id = '#[payload['CaseId__c']]' " doc:name="query Case from A"/>
                 </enricher>
             </batch:step>
-            <batch:step name="upsertCaseInAStep" filter-expression="#[org.mule.templates.utils.BatchExpressionFilter.evaluate(payload, recordVars['caseInTargetInstance'], flowVars['sourceSystem'], '${sfdc.b.integration.user.id}', 'A')]">
+            <batch:step name="upsertCaseInAStep" accept-expression="!org.mule.templates.utils.BatchExpressionFilter.evaluate(payload, recordVars['caseInTargetInstance'], flowVars['sourceSystem'], '${sfdc.b.integration.user.id}', 'A')">
                 <batch:set-record-variable variableName="accountToCreate" value="#[payload.Account__r]" doc:name="prepare account variable for subflow"/>
                 <enricher source="#[payload]" target="#[recordVars['targetAccount']]" doc:name="store subflow result in targetAccount">
                     <flow-ref name="checkTargetAccountSubflow" doc:name="call checkTargetAccount"/>

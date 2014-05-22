@@ -21,14 +21,10 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
         </sfdc:create>
     </sub-flow>
     <sub-flow name="queryCaseInAFlow" doc:name="queryCaseInAFlow">
-        <logger message="AAAA QUERY #[payload]" level="INFO" doc:name="Logger"/>
         <sfdc:query config-ref="SalesforceA" query="SELECT Id, Subject, ExtId__c, LastModifiedDate FROM Case WHERE Id = '#[payload['Id']]'" doc:name="Salesforce"/>
-        <logger message="AAAA RESULT QUERY #[payload]" level="INFO" doc:name="Logger"/>
     </sub-flow>
     <sub-flow name="queryCaseInBFlow" doc:name="queryCaseInBFlow">
-        <logger message="BBBB QUERY #[payload]" level="INFO" doc:name="Logger"/>
         <sfdc:query config-ref="SalesforceB" query="SELECT Id, Subject__c, LastModifiedDate, CaseId__c  FROM Case__c WHERE CaseId__c = '#[payload['CaseId__c']]'" doc:name="Salesforce"/>
-        <logger message="BBBB RESULT QUERY #[payload]" level="INFO" doc:name="Logger"/>
     </sub-flow>
     <sub-flow name="deleteCaseFromAFlow" doc:name="deleteCaseFromAFlow">
         <sfdc:delete config-ref="SalesforceA" doc:name="Salesforce">
