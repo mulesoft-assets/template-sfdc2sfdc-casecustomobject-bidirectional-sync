@@ -44,6 +44,6 @@ local.properties
 # --------------- #
 .studio/
 target/
-/bin
-/flows/
+bin
+flows/
 
