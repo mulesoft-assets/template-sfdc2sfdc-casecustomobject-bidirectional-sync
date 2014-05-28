@@ -96,7 +96,7 @@ Contact__c and Account__c lookup fields.
 + Subject__c `Text(50)`
 
 This structure may be customized but keep in mind that you will then need to 
-+ update query `fetch case__c objects from B` in `endpoints.mflow` to fetch all extra fields
++ update query `fetch case__c objects from B` in `endpoints.xml` to fetch all extra fields
 + update datamapper component `transform Case to Case__c`
 + update datamapper component `transform Case__c to Case`
 
