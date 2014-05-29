@@ -10,7 +10,9 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
     <data-mapper:config name="customobject_to_case" transformationGraphPath="customobject_to_case.grf" doc:name="customobject_to_case"/>
     <batch:job name="syncCasesBatch">
         <batch:threading-profile poolExhaustedAction="WAIT"/>
+
         <batch:process-records>
+
             <batch:step name="getCaseInBStep" accept-expression="'A'.equals(flowVars['sourceSystem']) &amp;&amp; payload['ExtId__c'] != null">
                 <enricher source="#[payload]" target="#[recordVars['caseInTargetInstance']]" doc:name="store Case__c in caseInTargetInstance">
 	            	<sfdc:query-single config-ref="SalesforceB" query="SELECT Id, Subject__c, LastModifiedDate FROM Case__c WHERE Id = '#[payload['ExtId__c']]'" doc:name="query Case__c from B"/>
@@ -18,7 +20,7 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
             
             </batch:step>
             <!-- TODO  remove the negation in the last condition of filter expression -->
-            <batch:step name="upsertCaseInBStep" accept-expression="'A'.equals(flowVars['sourceSystem']) &amp;&amp; (true || recordVars['accountInTargetInstance'] is NullPayload || recordVars['accountInTargetInstance'].get('LastModifiedDate') &lt; payload.get('LastModifiedDate') &amp;&amp; '${sfdc.a.integration.user.id}' != payload.get('LastModifiedById'))">
+            <batch:step name="upsertCaseInBStep" accept-expression="'A'.equals(flowVars['sourceSystem']) &amp;&amp; (recordVars['caseInTargetInstance'] == null || recordVars['caseInTargetInstance'].get('LastModifiedDate') &lt; payload.get('LastModifiedDate') &amp;&amp; '${sfdc.a.integration.user.id}' != payload.get('LastModifiedById'))">
                 <batch:set-record-variable variableName="accountToCreate" value="#[payload.Account]" doc:name="set accountToCreate variable"/>
                 <enricher source="#[payload]" target="#[recordVars['targetAccount']]" doc:name="store subflow result in targetAccount">
                     <flow-ref name="checkTargetAccountSubflow" doc:name="call checkTargetAccount"/>
@@ -39,7 +41,7 @@ if(!(recordVars['targetAccount'] is NullPayload)){
 }]]></expression-component>
                 <data-mapper:transform config-ref="case_to_customobject" doc:name="transform Case to Case__c"/>
                 <batch:commit size="100" doc:name="Batch Commit">
-                    <logger message="batchStep A Case to upsert #[payload]" level="INFO" doc:name="log payload"/>
+
                     <sfdc:upsert config-ref="SalesforceB" externalIdFieldName="Id" type="Case__c" doc:name="Upsert Case__c in B">
                         <sfdc:objects ref="#[payload]"/>
                     </sfdc:upsert>
@@ -52,9 +54,9 @@ if(!(recordVars['targetAccount'] is NullPayload)){
                 <enricher source="#[payload]" target="#[recordVars['caseInTargetInstance']]" doc:name="store Case in caseInTargetInstance">
                     <sfdc:query-single config-ref="SalesforceA" query="SELECT Id, Subject, LastModifiedDate FROM Case WHERE Id = '#[payload['CaseId__c']]' " doc:name="query Case from A"/>
                 </enricher>
-                <logger message="TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" level="INFO" doc:name="Logger"/>
+
             </batch:step>
-            <batch:step name="upsertCaseInAStep" accept-expression="'B'.equals(flowVars['sourceSystem']) &amp;&amp; (recordVars['accountInTargetInstance'] is NullPayload || recordVars['accountInTargetInstance'].get('LastModifiedDate') &lt; payload.get('LastModifiedDate') &amp;&amp; '${sfdc.b.integration.user.id}' != payload.get('LastModifiedById'))">
+            <batch:step name="upsertCaseInAStep" accept-expression="#['B'.equals(flowVars['sourceSystem']) &amp;&amp; (recordVars['caseInTargetInstance'] == null || recordVars['caseInTargetInstance'].get('LastModifiedDate') &lt; payload.get('LastModifiedDate') &amp;&amp; '${sfdc.b.integration.user.id}' != payload.get('LastModifiedById'))]">
                 <batch:set-record-variable variableName="accountToCreate" value="#[payload.Account__r]" doc:name="prepare account variable for subflow"/>
                 <enricher source="#[payload]" target="#[recordVars['targetAccount']]" doc:name="store subflow result in targetAccount">
                     <flow-ref name="checkTargetAccountSubflow" doc:name="call checkTargetAccount"/>
@@ -76,7 +78,7 @@ if(!(recordVars['targetAccount'] is NullPayload)){
 }]]></expression-component>
                 <data-mapper:transform doc:name="transform Case__c To Case" config-ref="customobject_to_case"/>
                 <batch:commit size="100" doc:name="Batch Commit">
-                    <logger message="batchStep B Case__c to upsert #[payload]" level="INFO" doc:name="log payload"/>
+
                     <sfdc:upsert config-ref="SalesforceA" externalIdFieldName="Id" type="Case" doc:name="upsert Case in A">
                         <sfdc:objects ref="#[payload]"/>
                     </sfdc:upsert>

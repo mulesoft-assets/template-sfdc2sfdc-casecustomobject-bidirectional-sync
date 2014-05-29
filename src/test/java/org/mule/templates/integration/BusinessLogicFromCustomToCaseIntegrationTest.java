@@ -120,12 +120,9 @@ public class BusinessLogicFromCustomToCaseIntegrationTest extends AbstractTempla
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void whenCreatingACustomObbectInBACaseIsCreatedInA() throws Exception {
+	public void whenCreatingACustomObjectInBACaseIsCreatedInA() throws Exception {
 		// Execution
-		System.err.println("before execute");
 		executeWaitAndAssertBatchJob(B_INBOUND_FLOW_NAME);
-		System.err.println("after execute");
-		
 		
 		// Get the data from A instance
 		Map<String, Object> caseA = new HashMap<String, Object>();
@@ -135,21 +132,14 @@ public class BusinessLogicFromCustomToCaseIntegrationTest extends AbstractTempla
 		MuleEvent event = queryCaseInAFlow.process(getTestEvent(caseA, MessageExchangePattern.REQUEST_RESPONSE));
 
 		ConsumerIterator<Object> queryResult = (ConsumerIterator<Object>) event.getMessage().getPayload();
-		while(queryResult.hasNext()){
-			System.err.println(queryResult.next().getClass());
-		}
-		
-		System.err.println(queryResult.size());
 		Map<String, Object> customObject = (Map<String, Object>) queryResult.next();  
+		log.info("Query Case from A result " + customObject);
 
-		
+		// Assertions
 		assertNotNull(customObject);
-//		assertEquals("The Id is not the right one: ", caseIdInB, customObject.get("CaseId__c"));
-//		
-//		this.caseB.put("Id", customObject.get("Id"));
-//		
-//		assertEquals("The Subject is not the right one: ", this.caseA.get("Subject"), customObject.get("Subject__c"));
-//		assertEquals("The Type is not the right one: ", "Case__c", customObject.get("type"));
+		assertEquals("The Id is not the right one: ", caseIdInB, customObject.get("ExtId__c"));
+		assertEquals("The Subject is not the right one: ", this.caseA.get("Subject"), customObject.get("Subject__c"));
+		assertEquals("The Type is not the right one: ", "Case", customObject.get("type"));
 	}
 
 
@@ -158,12 +148,11 @@ public class BusinessLogicFromCustomToCaseIntegrationTest extends AbstractTempla
 		caseB = createCase__c();
 		List casesB = new ArrayList();
 		casesB.add(caseB);
-		System.err.println(caseB);
 		
 		MuleEvent event = createCaseInBFlow.process(getTestEvent(casesB, MessageExchangePattern.REQUEST_RESPONSE));
 		List<SaveResult> result = (List<SaveResult>) event.getMessage().getPayload();
 		caseB.put("Id", result.get(0).getId());
-		System.err.println("XXXXXX caseB " +result.get(0));
+		log.info("Save Case__c to B result " +result.get(0));
 	}
 
 	private void deleteCases() throws Exception {
@@ -193,7 +182,6 @@ public class BusinessLogicFromCustomToCaseIntegrationTest extends AbstractTempla
 	private Map<String, Object> createCase__c() {
 		String name = buildUniqueName();
 		return ObjectBuilder.aCustomObject()
-				.with("CaseId__c", "123456789")
 				.with("Subject__c", name)
 				.with("Description__c", name)
 				.with("Priority__c", "Low")
