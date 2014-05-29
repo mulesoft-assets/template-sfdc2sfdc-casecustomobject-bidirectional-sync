@@ -31,6 +31,7 @@ WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateB']] ORDER BY LastModifiedD
 
         <set-variable variableName="sourceSystem" value="B" doc:name="set sourceSystem to 'B'"/>
 
+
         <batch:execute name="syncCasesBatch" doc:name="call syncCasesBatch"/>
     </flow>
 </mule>
