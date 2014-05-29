@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class ObjectBuilder {
 
-	private final Map<String, Object> fields;
+	private final Map<String, Object> fields; 
 
 	public ObjectBuilder() {
 		this.fields = new HashMap<String, Object>();

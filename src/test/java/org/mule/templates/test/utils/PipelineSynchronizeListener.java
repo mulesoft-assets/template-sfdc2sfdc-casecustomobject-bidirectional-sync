@@ -6,7 +6,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.PipelineMessageNotificationListener;
 import org.mule.context.notification.PipelineMessageNotification;
 
-/**
+/** 
  * This listener checks notifications of flows finalizations.
  * 
  * Upon notification it will check that the flowToCheck property matches the name of the flow notifying its completion. Should the name match it will change the

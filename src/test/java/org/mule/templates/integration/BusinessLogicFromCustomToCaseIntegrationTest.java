@@ -30,7 +30,7 @@ import com.sforce.soap.partner.SaveResult;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-/**
+/** 
  * The objective of this class is to validate the correct behavior of the flows for this Mule Template that make calls to external systems.
  */
 public class BusinessLogicFromCustomToCaseIntegrationTest extends AbstractTemplateTestCase {

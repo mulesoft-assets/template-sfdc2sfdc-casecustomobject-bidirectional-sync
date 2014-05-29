@@ -5,7 +5,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.mule.api.transformer.TransformerException;
 
-public class DateUtilsTest {
+public class DateUtilsTest { 
 	@Test(expected = IllegalArgumentException.class)
 	public void nullConcactA() {
 		String dateA = null;

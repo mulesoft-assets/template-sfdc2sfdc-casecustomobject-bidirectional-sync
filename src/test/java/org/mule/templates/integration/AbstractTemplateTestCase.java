@@ -12,7 +12,7 @@ import org.mule.tck.junit4.FunctionalTestCase;
 /**
  * This is the base test class for Anypoint Templates integration tests.
  * 
- * @author damiansima
+ * @author damiansima 
  */
 public class AbstractTemplateTestCase extends FunctionalTestCase {
 	private static final String MAPPINGS_FOLDER_PATH = "./mappings";

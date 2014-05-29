@@ -12,7 +12,6 @@ import org.joda.time.format.DateTimeFormatter;
  * @author damiansima
  */
 public class DateUtils {
-
 	/**
 	 * The method will take any date and validate if it finish with "Z"
 	 * indicating GMT 0 time zone. If so it will transform it to +00:00 offset.
