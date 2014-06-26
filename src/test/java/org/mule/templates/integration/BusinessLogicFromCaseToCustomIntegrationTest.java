@@ -46,6 +46,7 @@ public class BusinessLogicFromCaseToCustomIntegrationTest extends AbstractTempla
 	
 	private BatchTestHelper batchTestHelper;
 	
+	
 	private InterceptingChainLifecycleWrapper queryCaseInBFlow;
 	private SubflowInterceptingChainLifecycleWrapper createCaseInBFlow;
 	private SubflowInterceptingChainLifecycleWrapper deleteCaseFromAFlow;
