@@ -5,7 +5,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
 http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/current/mule-smtp.xsd
 http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd">
-    <context:property-placeholder location="common.properties, mule.${mule.env}.properties"/>
+    <context:property-placeholder location="common.properties, mule.${mule.env:test}.properties"/>
     <smtp:gmail-connector name="gmailConnector" validateConnections="true" doc:name="Gmail" doc:description="This is the connector used to send email notifications. You should change its configuration to select a different email provider"/>
     <sfdc:config name="SalesforceA" username="${sfdc.a.username}" password="${sfdc.a.password}" securityToken="${sfdc.a.securityToken}" url="${sfdc.a.url}" doc:name="Salesforce" doc:description="One of your SalesForce instances">
         <sfdc:connection-pooling-profile initialisationPolicy="INITIALISE_ONE" exhaustedAction="WHEN_EXHAUSTED_GROW"/>
