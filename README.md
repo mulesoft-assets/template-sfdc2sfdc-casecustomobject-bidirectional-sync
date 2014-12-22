@@ -96,7 +96,7 @@ In order to have your application up and running you just need to complete two s
  2. Run it! ([on premise](#runonopremise) or [in Cloudhub](#runoncloudhub))
 
 ## Running on premise <a name="runonopremise"/>
-Complete all properties in one of the property files, for example in [mule.dev.properties] (../blob/master/src/main/resources/mule.dev.properties) and run your app with the corresponding environment variable to use it. To follow the example, this will be `mule.env=dev`.
+In this section we detail the way you have to run you Anypoint Temple on you computer.
 
 
 ### Where to Download Mule Studio and Mule ESB
@@ -129,7 +129,7 @@ Once you have imported you Anypoint Template into Anypoint Studio you need to fo
 
 ### Running on Mule ESB stand alone <a name="runonmuleesbstandalone"/>
 Complete all properties in one of the property files, for example in [mule.prod.properties] (../blob/master/src/main/resources/mule.prod.properties) and run your app with the corresponding environment variable to use it. To follow the example, this will be `mule.env=prod`. 
-
+Complete all properties in one of the property files, for example in [mule.dev.properties] (../master/src/main/resources/mule.dev.properties) and run your app with the corresponding environment variable to use it. To follow the example, this will be `mule.env=dev`.
 
 ## Running on CloudHub <a name="runoncloudhub"/>
 While [creating your application on CloudHub](http://www.mulesoft.org/documentation/display/current/Hello+World+on+CloudHub) (Or you can do it later as a next step), you need to go to Deployment > Advanced to set all environment variables detailed in **Properties to be configured** as well as the **mule.env**.

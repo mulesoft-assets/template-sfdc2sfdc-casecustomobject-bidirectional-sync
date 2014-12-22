@@ -35,9 +35,9 @@ In order to have your application up and running you just need to complete two s
 In order to [create your application on CloudHub](http://www.mulesoft.org/documentation/display/current/Hello+World+on+CloudHub) you should to go to Deployment > Advanced to set all environment variables detailed in **Properties to be configured** as well as the **mule.env**. 
 ]]>
 		</section>
-		<section id="default_running_on_premise">
+		<section id="running_on_standalone">
 <![CDATA[
-Complete all properties in one of the property files, for example in [mule.dev.properties] (../blob/master/src/main/resources/mule.dev.properties) and run your app with the corresponding environment variable to use it. To follow the example, this will be `mule.env=dev`.
+Complete all properties in one of the property files, for example in [mule.dev.properties] (../master/src/main/resources/mule.dev.properties) and run your app with the corresponding environment variable to use it. To follow the example, this will be `mule.env=dev`.
 ]]>
 		</section>
 		<section id="application_configuration">
