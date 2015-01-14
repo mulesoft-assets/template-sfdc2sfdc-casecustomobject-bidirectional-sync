@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
 http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
@@ -8,19 +8,20 @@ http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schem
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
     <data-mapper:config name="case_to_customobject" transformationGraphPath="case_to_customobject.grf" doc:name="case_to_customobject"/>
     <data-mapper:config name="customobject_to_case" transformationGraphPath="customobject_to_case.grf" doc:name="customobject_to_case"/>
-    <batch:job name="syncCasesBatch">
+    <batch:job name="syncCasesToOrgBBatch">
         <batch:threading-profile poolExhaustedAction="WAIT"/>
 
         <batch:process-records>
 
-            <batch:step name="getCaseInBStep" accept-expression="'A'.equals(flowVars['sourceSystem']) &amp;&amp; payload['ExtId__c'] != null">
+            <batch:step name="getCaseInBStep" accept-expression="payload['ExtId__c'] != null">
                 <enricher source="#[payload]" target="#[recordVars['caseInTargetInstance']]" doc:name="store Case__c in caseInTargetInstance">
 	            	<sfdc:query-single config-ref="SalesforceB" query="SELECT Id, Subject__c, LastModifiedDate FROM Case__c WHERE Id = '#[payload['ExtId__c']]'" doc:name="query Case__c from B"/>
                 </enricher>
+
             
             </batch:step>
             <!-- TODO  remove the negation in the last condition of filter expression -->
-            <batch:step name="upsertCaseInBStep" accept-expression="'A'.equals(flowVars['sourceSystem']) &amp;&amp; (recordVars['caseInTargetInstance'] == null || recordVars['caseInTargetInstance'].get('LastModifiedDate') &lt; payload.get('LastModifiedDate') &amp;&amp; '${sfdc.a.integration.user.id}' != payload.get('LastModifiedById'))">
+            <batch:step name="upsertCaseInBStep" accept-expression="(recordVars['caseInTargetInstance'] == null ||  recordVars['caseInTargetInstance'].get('LastModifiedDate') &lt; payload.get('LastModifiedDate')) &amp;&amp; '${sfdc.a.integration.user.id}' != payload.get('LastModifiedById')">
                 <batch:set-record-variable variableName="accountToCreate" value="#[payload.Account]" doc:name="set accountToCreate variable"/>
                 <enricher source="#[payload]" target="#[recordVars['targetAccount']]" doc:name="store subflow result in targetAccount">
                     <flow-ref name="checkTargetAccountSubflow" doc:name="call checkTargetAccount"/>
@@ -39,24 +40,37 @@ if(!(recordVars['targetContact'] is NullPayload)){
 if(!(recordVars['targetAccount'] is NullPayload)){
 	payload.put('AccountId', recordVars['targetAccount']);
 }]]></expression-component>
+
                 <data-mapper:transform config-ref="case_to_customobject" doc:name="transform Case to Case__c"/>
                 <batch:commit size="100" doc:name="Batch Commit">
+
 
                     <sfdc:upsert config-ref="SalesforceB" externalIdFieldName="Id" type="Case__c" doc:name="Upsert Case__c in B">
                         <sfdc:objects ref="#[payload]"/>
                     </sfdc:upsert>
-                    <logger message="batchStep A Case upsert result #[payload]" level="INFO" doc:name="log result"/>
+                    <logger message="A-&gt;B Case upsert result #[payload]" level="INFO" doc:name="log result"/>
                 </batch:commit>
 
             </batch:step>
+            
+           
+        </batch:process-records>
+        <batch:on-complete>
+            <expression-component doc:name="Expression"><![CDATA[#[app.registry['PollSynchronizer'].unlock()]]]></expression-component>
+        </batch:on-complete>
+    </batch:job>
+    <batch:job name="syncCasesToOrgABatch">
+        <batch:threading-profile poolExhaustedAction="WAIT"/>
+        <batch:process-records>
             <!-- TODO  remove the negation in the last condition of filter expression -->
-            <batch:step name="getCaseInAStep" accept-expression="'B'.equals(flowVars['sourceSystem']) &amp;&amp; payload['CaseId__c'] != null">
+            <batch:step name="getCaseInAStep" accept-expression="payload['CaseId__c'] != null">
                 <enricher source="#[payload]" target="#[recordVars['caseInTargetInstance']]" doc:name="store Case in caseInTargetInstance">
                     <sfdc:query-single config-ref="SalesforceA" query="SELECT Id, Subject, LastModifiedDate FROM Case WHERE Id = '#[payload['CaseId__c']]' " doc:name="query Case from A"/>
                 </enricher>
 
+
             </batch:step>
-            <batch:step name="upsertCaseInAStep" accept-expression="'B'.equals(flowVars['sourceSystem']) &amp;&amp; (recordVars['caseInTargetInstance'] == null || recordVars['caseInTargetInstance'].get('LastModifiedDate') &lt; payload.get('LastModifiedDate') &amp;&amp; '${sfdc.b.integration.user.id}' != payload.get('LastModifiedById'))">
+            <batch:step name="upsertCaseInAStep" accept-expression="(recordVars['caseInTargetInstance'] == null || recordVars['caseInTargetInstance'].get('LastModifiedDate') &lt; payload.get('LastModifiedDate') &amp;&amp; '${sfdc.b.integration.user.id}' != payload.get('LastModifiedById'))">
                 <batch:set-record-variable variableName="accountToCreate" value="#[payload.Account__r]" doc:name="prepare account variable for subflow"/>
                 <enricher source="#[payload]" target="#[recordVars['targetAccount']]" doc:name="store subflow result in targetAccount">
                     <flow-ref name="checkTargetAccountSubflow" doc:name="call checkTargetAccount"/>
@@ -82,12 +96,14 @@ if(!(recordVars['targetAccount'] is NullPayload)){
                     <sfdc:upsert config-ref="SalesforceA" externalIdFieldName="Id" type="Case" doc:name="upsert Case in A">
                         <sfdc:objects ref="#[payload]"/>
                     </sfdc:upsert>
-                    <logger message="batchStep B Case__c upsert result #[payload]" level="INFO" doc:name="log result"/>
+                    <logger message="B-&gt;A Case__c upsert result #[payload]" level="INFO" doc:name="log result"/>
                 </batch:commit>
 
             </batch:step>
-           
         </batch:process-records>
+        <batch:on-complete>
+            <expression-component doc:name="Expression"><![CDATA[#[app.registry['PollSynchronizer'].unlock()]]]></expression-component>
+        </batch:on-complete>
     </batch:job>
     <sub-flow name="checkTargetAccountSubflow" doc:name="checkTargetAccountSubflow">
         <choice doc:name="Choice">

@@ -13,4 +13,7 @@ http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfd
     <sfdc:config name="SalesforceB" username="${sfdc.b.username}" password="${sfdc.b.password}" securityToken="${sfdc.b.securityToken}" url="${sfdc.b.url}" doc:name="Salesforce" doc:description="Other SalesForce instance">
         <sfdc:connection-pooling-profile initialisationPolicy="INITIALISE_ONE" exhaustedAction="WHEN_EXHAUSTED_GROW"/>
     </sfdc:config>
+    <spring:beans>
+  		<spring:bean id="PollSynchronizer" name="PollSynchronizer" class="org.mule.templates.util.PollSynchronizer" scope="singleton" />
+ 	</spring:beans>
 </mule>
