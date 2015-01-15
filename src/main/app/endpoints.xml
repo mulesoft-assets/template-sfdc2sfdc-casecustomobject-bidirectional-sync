@@ -11,14 +11,15 @@ http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/ba
             <fixed-frequency-scheduler frequency="${polling.frequency}" startDelay="1000"/>
             <watermark variable="lastQueryDateA" default-expression="${watermark.default.expression}" selector="MAX" selector-expression="#[payload.LastModifiedDate]"/>
             <processor-chain doc:name="Processor Chain">
-            	<expression-component doc:name="lock processing to avoid two syncs occurring at the same time"><![CDATA[app.registry['PollSynchronizer'].lock();]]></expression-component>            
+            	<expression-component doc:name="lock processing to avoid two syncs occurring at the same time"><![CDATA[app.registry['PollSynchronizer'].lock();]]></expression-component>           
             	<sfdc:query config-ref="SalesforceA" query="dsql:SELECT Id,Description,Subject,LastModifiedDate,LastModifiedById,Origin,Priority,Status, ExtId__c,
  ContactId, Contact.FirstName, Contact.LastName, Contact.Email, AccountId, Account.Name 
  FROM Case 
  WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateA']] ORDER BY LastModifiedDate ASC LIMIT 200" doc:name="fetch cases from A"/> 
         	</processor-chain>
         </poll>
-
+			
+        <set-variable variableName="sourceSystem" value="A" doc:name="set sourceSystem to 'A'"/>
         <batch:execute name="syncCasesToOrgBBatch" doc:name="call syncCasesBatch"/>
     </flow>
     
@@ -27,14 +28,14 @@ http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/ba
             <fixed-frequency-scheduler frequency="${polling.frequency}" startDelay="1000" />
             <watermark variable="lastQueryDateB" default-expression="${watermark.default.expression}" selector="MAX" selector-expression="#[payload.LastModifiedDate]"/>
             <processor-chain doc:name="Processor Chain">
-            	<expression-component doc:name="lock processing to avoid two syncs occurring at the same time"><![CDATA[app.registry['PollSynchronizer'].lock();]]></expression-component>
+            	<expression-component doc:name="lock processing to avoid two syncs occurring at the same time"><![CDATA[app.registry['PollSynchronizer'].lock();]]></expression-component>                
             	<sfdc:query config-ref="SalesforceB" query="dsql:SELECT Id,Description__c,Subject__c,LastModifiedDate,LastModifiedById,Origin__c,Priority__c,Status__c, CaseId__c,
  Contact__c, Contact__r.FirstName, Contact__r.LastName, Contact__r.Email, Account__c,Account__r.Name 
  FROM Case__c 
  WHERE LastModifiedDate &gt; #[flowVars['lastQueryDateB']] ORDER BY LastModifiedDate ASC LIMIT 200" doc:name="fetch case__c objects from B"/>    
             </processor-chain>                        
         </poll>
-
+        <set-variable variableName="sourceSystem" value="B" doc:name="set sourceSystem to 'B'"/>
         <batch:execute name="syncCasesToOrgABatch" doc:name="call syncCasesBatch"/>
     </flow>
 </mule>
