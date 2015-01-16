@@ -21,6 +21,7 @@ http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/ba
 			
         <set-variable variableName="sourceSystem" value="A" doc:name="set sourceSystem to 'A'"/>
         <batch:execute name="syncCasesToOrgBBatch" doc:name="call syncCasesBatch"/>
+        <exception-strategy ref="defaultChoiceExceptionStrategy" doc:name="Reference Exception Strategy"/>
     </flow>
     
     <flow name="triggerSyncFromBFlow" doc:name="triggerSyncFromBFlow" processingStrategy="synchronous">
@@ -37,5 +38,6 @@ http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/ba
         </poll>
         <set-variable variableName="sourceSystem" value="B" doc:name="set sourceSystem to 'B'"/>
         <batch:execute name="syncCasesToOrgABatch" doc:name="call syncCasesBatch"/>
+        <exception-strategy ref="defaultChoiceExceptionStrategy" doc:name="Reference Exception Strategy"/>
     </flow>
 </mule>
