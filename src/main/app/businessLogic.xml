@@ -42,12 +42,24 @@ if(!(recordVars['targetAccount'] is NullPayload)){
 
                 <data-mapper:transform config-ref="case_to_customobject" doc:name="transform Case to Case__c"/>
                 <batch:commit size="100" doc:name="Batch Commit">
+                    <set-variable variableName="sfdcAId" value="#[payload.get(0).CaseId__c]" doc:name="Store case A Id" doc:description="Id of A Case is stored in the CaseId__c of Case__c in B"/>
 
 
                     <sfdc:upsert config-ref="SalesforceB" externalIdFieldName="Id" type="Case__c" doc:name="Upsert Case__c in B">
                         <sfdc:objects ref="#[payload]"/>
                     </sfdc:upsert>
                     <logger message="A-&gt;B Case upsert result #[payload]" level="INFO" doc:name="log result"/>
+                    <expression-component doc:name="Prepare Salesforce A Case for ExtId__c update"><![CDATA[java.util.Map caseA = new java.util.HashMap();
+caseA.put('Id', flowVars.sfdcAId);
+caseA.put('ExtId__c', payload.get(0).id);
+
+java.util.List list = new java.util.ArrayList();
+list.add(caseA);
+payload = list;]]></expression-component>
+                    <sfdc:update config-ref="SalesforceA" type="Case" doc:name="update Salesforce A Case with ExtId__c">
+                        <sfdc:objects ref="#[payload]"/>
+                    </sfdc:update>
+                    <logger message="ExtId__c in A was updated" level="INFO" doc:name="Logger"/>
                 </batch:commit>
 
             </batch:step>
@@ -68,7 +80,7 @@ if(!(recordVars['targetAccount'] is NullPayload)){
 
 
             </batch:step>
-            <batch:step name="upsertCaseInAStep" accept-expression="(recordVars['caseInTargetInstance'] == null || recordVars['caseInTargetInstance'].get('LastModifiedDate') &lt; payload.get('LastModifiedDate') &amp;&amp; '${sfdc.b.integration.user.id}' != payload.get('LastModifiedById'))">
+            <batch:step name="upsertCaseInAStep" accept-expression="(recordVars['caseInTargetInstance'] == null || recordVars['caseInTargetInstance'].get('LastModifiedDate') &lt; payload.get('LastModifiedDate')) &amp;&amp; '${sfdc.b.integration.user.id}' != payload.get('LastModifiedById')">
                 <batch:set-record-variable variableName="accountToCreate" value="#[payload.Account__r]" doc:name="prepare account variable for subflow"/>
                 <enricher source="#[payload]" target="#[recordVars['targetAccount']]" doc:name="store subflow result in targetAccount">
                     <flow-ref name="checkTargetAccountSubflow" doc:name="call checkTargetAccount"/>
@@ -90,11 +102,23 @@ if(!(recordVars['targetAccount'] is NullPayload)){
 }]]></expression-component>
                 <data-mapper:transform doc:name="transform Case__c To Case" config-ref="customobject_to_case"/>
                 <batch:commit size="100" doc:name="Batch Commit">
+                    <set-variable variableName="sfdcBId" value="#[payload.get(0).ExtId__c]" doc:name="Store Case__c B Id" doc:description="Id of B Case__c is stored in the ExtId__c of Case in A"/>
 
                     <sfdc:upsert config-ref="SalesforceA" externalIdFieldName="Id" type="Case" doc:name="upsert Case in A">
                         <sfdc:objects ref="#[payload]"/>
                     </sfdc:upsert>
                     <logger message="B-&gt;A Case__c upsert result #[payload]" level="INFO" doc:name="log result"/>
+                    <expression-component doc:name="Prepare Salesforce B Case__c for CaseId__c update"><![CDATA[java.util.Map caseB = new java.util.HashMap();
+caseB.put('Id', flowVars.sfdcBId);
+caseB.put('CaseId__c', payload.get(0).id);
+
+java.util.List list = new java.util.ArrayList();
+list.add(caseB);
+payload = list;]]></expression-component>
+                    <sfdc:update config-ref="SalesforceB" type="Case__c" doc:name="update Salesforce B Case__c with CaseId__c">
+                        <sfdc:objects ref="#[payload]"/>
+                    </sfdc:update>
+                    <logger message="CaseId__c in B was updated" level="INFO" doc:name="Logger"/>
                 </batch:commit>
 
             </batch:step>
