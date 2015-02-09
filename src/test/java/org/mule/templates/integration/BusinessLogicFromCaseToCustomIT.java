@@ -38,9 +38,9 @@ import static org.junit.Assert.assertNotNull;
 /**
  * The objective of this class is to validate the correct behavior of the flows for this Mule Template that make calls to external systems.
  */
-public class BusinessLogicFromCaseToCustomIntegrationTest extends AbstractTemplateTestCase {
+public class BusinessLogicFromCaseToCustomIT extends AbstractTemplateTestCase {
 
-	private static final Logger log = Logger.getLogger(BusinessLogicFromCaseToCustomIntegrationTest.class);
+	private static final Logger log = Logger.getLogger(BusinessLogicFromCaseToCustomIT.class);
 	private static final int TIMEOUT_MILLIS = 60;
 	
 	private static final String ANYPOINT_TEMPLATE_NAME = "sfdc2sfdc-case2custom-bidirectional-sync";
