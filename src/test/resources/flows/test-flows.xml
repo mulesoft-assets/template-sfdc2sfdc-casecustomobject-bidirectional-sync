@@ -10,35 +10,41 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http:/
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+    <sfdc:config name="SalesforceA_Test" username="${test.sfdc.a.username}" password="${test.sfdc.a.password}" securityToken="${test.sfdc.a.securityToken}" url="${test.sfdc.a.url}" doc:name="Salesforce" doc:description="One of your SalesForce instances">
+        <sfdc:connection-pooling-profile initialisationPolicy="INITIALISE_ONE" exhaustedAction="WHEN_EXHAUSTED_GROW"/>
+    </sfdc:config>
+    <sfdc:config name="SalesforceB_Test" username="${test.sfdc.b.username}" password="${test.sfdc.b.password}" securityToken="${test.sfdc.b.securityToken}" url="${test.sfdc.b.url}" doc:name="Salesforce" doc:description="Other SalesForce instance">
+        <sfdc:connection-pooling-profile initialisationPolicy="INITIALISE_ONE" exhaustedAction="WHEN_EXHAUSTED_GROW"/>
+    </sfdc:config>
    
     <sub-flow name="createCaseInAFlow" doc:name="createCaseInAFlow">
-        <sfdc:create config-ref="SalesforceA" type="Case" doc:name="Salesforce">
+        <sfdc:create config-ref="SalesforceA_Test" type="Case" doc:name="Salesforce">
             <sfdc:objects ref="#[payload]"/>
         </sfdc:create>
     </sub-flow>
     
     <sub-flow name="createCaseInBFlow" doc:name="createCaseInBFlow">
-        <sfdc:create config-ref="SalesforceB" type="Case__c" doc:name="Salesforce">
+        <sfdc:create config-ref="SalesforceB_Test" type="Case__c" doc:name="Salesforce">
             <sfdc:objects ref="#[payload]"/>
         </sfdc:create>
     </sub-flow>
     
     <sub-flow name="queryCaseInAFlow" doc:name="queryCaseInAFlow">
-        <sfdc:query config-ref="SalesforceA" query="SELECT Id, Subject, ExtId__c, LastModifiedDate FROM Case WHERE ExtId__c = '#[payload['ExtId__c']]'" doc:name="Salesforce"/>
+        <sfdc:query config-ref="SalesforceA_Test" query="SELECT Id, Subject, ExtId__c, LastModifiedDate FROM Case WHERE ExtId__c = '#[payload['ExtId__c']]'" doc:name="Salesforce"/>
     </sub-flow>
     
     <sub-flow name="queryCaseInBFlow" doc:name="queryCaseInBFlow">
-        <sfdc:query config-ref="SalesforceB" query="SELECT Id, Subject__c, LastModifiedDate, CaseId__c  FROM Case__c WHERE CaseId__c = '#[payload['CaseId__c']]'" doc:name="Salesforce"/>
+        <sfdc:query config-ref="SalesforceB_Test" query="SELECT Id, Subject__c, LastModifiedDate, CaseId__c  FROM Case__c WHERE CaseId__c = '#[payload['CaseId__c']]'" doc:name="Salesforce"/>
     </sub-flow>
     
     <sub-flow name="deleteCaseFromAFlow" doc:name="deleteCaseFromAFlow">
-        <sfdc:delete config-ref="SalesforceA" doc:name="Salesforce">
+        <sfdc:delete config-ref="SalesforceA_Test" doc:name="Salesforce">
             <sfdc:ids ref="#[payload]"/>
         </sfdc:delete>
     </sub-flow>
     
     <sub-flow name="deleteCaseFromBFlow" doc:name="deleteCaseFromBFlow">
-        <sfdc:delete config-ref="SalesforceB" doc:name="Salesforce">
+        <sfdc:delete config-ref="SalesforceB_Test" doc:name="Salesforce">
             <sfdc:ids ref="#[payload]"/>
         </sfdc:delete>
     </sub-flow>
