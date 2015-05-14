@@ -9,7 +9,7 @@ As a Salesforce admin I want to have my Cases from orgA synchronized with Custom
 
 This Template should serve as a foundation for setting an online bi-directional sync of Cases and Custom Objects between two SalesForce instances, being able to specify filtering criterias. 
 
-The integration main behavior is polling for changes (new Cases/Custom objects or modified ones) that have occurred in any of the Salesforce instances during a certain defined period of time. For those Contacts that both have not been updated yet the integration triggers an upsert (update or create depending the case) taking the last modification as the one that should be applied.
+The integration main behavior is polling for changes (new Cases/Custom objects or modified ones) that have occurred in any of the Salesforce instances during a certain defined period of time. For those Cases/Custom objects that both have not been updated yet the integration triggers an upsert (update or create depending the case) taking the last modification as the one that should be applied.
 
 Additionally, there are two subflows which are syncing Accounts and Contacts if the Case in orgA or Case__c custom object in orgB in manner of one time integration.
 If the Account or Contact field in Case object is specified and the Account or Contact does not exist in other org, it will be created for first time.
@@ -76,15 +76,15 @@ The query fields list must include both 'Email' and 'LastModifiedDate' fields, a
 
 To be able to match pair Case object in orgA with Case custom object in orgB we needed to extend Case object in orgA with following field. 
 
-+ ExtId__c `Text(50) External ID` external id which is referencing ID of Case__c in orgB
++ ExtId__c `Text(50) External ID` external id which is referencing ID of Case\_\_c in orgB
 
 Feel free to customize the name of this field, but keep in mind that you will need to update all occurrences in flows for this particular field reference.
 
 
 #### Structure of the Case Custom object
 
-In this particular template we named the Custom object `Case`, that is the API name of the Custom object in orgB is `Case__c`, so all soql queries, datamapper conversions are issued to this particular object. Case__c custom object inherits all required fields from Case in orgA together with Description__c, Subject__c text fields and
-Contact__c and Account__c lookup fields.
+In this particular template we named the Custom object `Case`, that is the API name of the Custom object in orgB is `Case__c`, so all soql queries, datamapper conversions are issued to this particular object. Case\_\_c custom object inherits all required fields from Case in orgA together with Description\_\_c, Subject\_\_c text fields and
+Contact\_\_c and Account\_\_c lookup fields.
 
 + Account__c `Lookup(Account)`
 + CaseId__c `Text(50) External ID` external id which is referencing ID of Case in orgA
@@ -96,6 +96,7 @@ Contact__c and Account__c lookup fields.
 + Subject__c `Text(50)`
 
 This structure may be customized but keep in mind that you will then need to 
+
 + update query `fetch case__c objects from B` in `endpoints.xml` to fetch all extra fields
 + update datamapper component `transform Case to Case__c`
 + update datamapper component `transform Case__c to Case`
