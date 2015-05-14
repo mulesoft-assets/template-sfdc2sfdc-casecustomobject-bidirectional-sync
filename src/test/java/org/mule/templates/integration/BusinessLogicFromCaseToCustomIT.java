@@ -11,7 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -40,7 +41,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class BusinessLogicFromCaseToCustomIT extends AbstractTemplateTestCase {
 
-	private static final Logger log = Logger.getLogger(BusinessLogicFromCaseToCustomIT.class);
+	private static final Logger log = LogManager.getLogger(BusinessLogicFromCaseToCustomIT.class);
 	private static final int TIMEOUT_MILLIS = 60;
 	
 	private static final String ANYPOINT_TEMPLATE_NAME = "sfdc2sfdc-case2custom-bidirectional-sync";

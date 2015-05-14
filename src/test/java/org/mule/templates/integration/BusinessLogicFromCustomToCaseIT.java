@@ -6,12 +6,16 @@
 
 package org.mule.templates.integration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -32,15 +36,12 @@ import org.mule.templates.builders.ObjectBuilder;
 import com.mulesoft.module.batch.BatchTestHelper;
 import com.sforce.soap.partner.SaveResult;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 /** 
  * The objective of this class is to validate the correct behavior of the flows for this Mule Template that make calls to external systems.
  */
 public class BusinessLogicFromCustomToCaseIT extends AbstractTemplateTestCase {
 
-	private static final Logger log = Logger.getLogger(BusinessLogicFromCaseToCustomIT.class);
+	private static final Logger log = LogManager.getLogger(BusinessLogicFromCaseToCustomIT.class);
 	private static final int TIMEOUT_MILLIS = 60;
 	
 	private static final String ANYPOINT_TEMPLATE_NAME = "sfdc2sfdc-case2custom-bidirectional-sync";
