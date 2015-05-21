@@ -7,15 +7,15 @@
 		<section id="use_case">
 As a Salesforce admin I want to have my Cases from orgA synchronized with Custom objects from Salesforce orgB.
 
-This Template should serve as a foundation for setting an online bi-directional sync of Cases and Custom Objects between two SalesForce instances, being able to specify filtering criterias. 
+This Template should serve as a foundation for setting an online bi-directional sync of Cases and Custom Objects between two SalesForce instances, being able to specify filtering criteria. 
 
 The integration main behavior is polling for changes (new Cases/Custom objects or modified ones) that have occurred in any of the Salesforce instances during a certain defined period of time. For those Cases/Custom objects that both have not been updated yet the integration triggers an upsert (update or create depending the case) taking the last modification as the one that should be applied.
 
-Additionally, there are two subflows which are syncing Accounts and Contacts if the Case in orgA or Case__c custom object in orgB in manner of one time integration.
+Additionally, there are two subflows which are synchronizing Accounts and Contacts if the Case in orgA or Case__c custom object in orgB in manner of one time integration.
 If the Account or Contact field in Case object is specified and the Account or Contact does not exist in other org, it will be created for first time.
 The matching criteria for Account is field 'Account Name'. And matching criteria for Contact is field 'Email'.
 
-Requirements have been set not only to be used as examples, but also to stablish starting point to adapt the integration to any given requirements.
+Requirements have been set not only to be used as examples, but also to establish starting point to adapt the integration to any given requirements.
 		</section>
 		<section id="considerations">
 <![CDATA[
