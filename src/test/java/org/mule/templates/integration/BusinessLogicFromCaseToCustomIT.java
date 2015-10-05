@@ -41,7 +41,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class BusinessLogicFromCaseToCustomIT extends AbstractTemplateTestCase {
 
-	private static final Logger log = LogManager.getLogger(BusinessLogicFromCaseToCustomIT.class);
+	private static final Logger LOGGER = LogManager.getLogger(BusinessLogicFromCaseToCustomIT.class);
 	private static final int TIMEOUT_MILLIS = 60;
 	
 	private static final String ANYPOINT_TEMPLATE_NAME = "sfdc2sfdc-case2custom-bidirectional-sync";
@@ -128,9 +128,12 @@ public class BusinessLogicFromCaseToCustomIT extends AbstractTemplateTestCase {
 	@Test
 	@SuppressWarnings("unchecked")
 	public void whenCreatingACaseInAANewCustomObbectIsCreatedInB() throws Exception {
+
+		Thread.sleep(10000);		
 		// Execution
 		executeWaitAndAssertBatchJob(A_INBOUND_FLOW_NAME);
 
+		Thread.sleep(10000);		
 		// Get the data from B instance
 		Map<String, Object> caseB = new HashMap<String, Object>();
 		this.caseB = caseB;
@@ -138,7 +141,7 @@ public class BusinessLogicFromCaseToCustomIT extends AbstractTemplateTestCase {
 		caseB.put("CaseId__c", caseIdInA);
 		MuleEvent event = queryCaseInBFlow.process(getTestEvent(caseB, MessageExchangePattern.REQUEST_RESPONSE));
 		ConsumerIterator<Object> queryResult = (ConsumerIterator<Object>) event.getMessage().getPayload();
-		Map<String, Object> customObject = (Map<String, Object>) queryResult.next();  
+		Map<String, Object> customObject = queryResult.hasNext() ? (Map<String, Object>) queryResult.next() : null;  
 		
 		assertNotNull(customObject);
 		assertEquals("The Id is not the right one: ", caseIdInA, customObject.get("CaseId__c"));
@@ -157,10 +160,10 @@ public class BusinessLogicFromCaseToCustomIT extends AbstractTemplateTestCase {
 		MuleEvent event = createCaseInAFlow.process(getTestEvent(casesA, MessageExchangePattern.REQUEST_RESPONSE));
 		@SuppressWarnings("unchecked")
 		List<SaveResult> result = ((List<SaveResult>) event.getMessage().getPayload());
-		log.info("Create test Case in A result: " + result.get(0));
+		LOGGER.info("Create test Case in A result: " + result.get(0));
 		
 		caseA.put("Id", result.get(0).getId());
-		log.info("Created Case in A: " + caseA);
+		LOGGER.info("Created Case in A: " + caseA);
 		
 		return caseA;
 	}
@@ -175,7 +178,7 @@ public class BusinessLogicFromCaseToCustomIT extends AbstractTemplateTestCase {
 			
 			event = deleteCaseFromAFlow.process(getTestEvent(casesA, MessageExchangePattern.REQUEST_RESPONSE));
 			result = event.getMessage().getPayload();
-			log.info("Delete Case from A result: " + result);
+			LOGGER.info("Delete Case from A result: " + result);
 		}
 
 		if (caseB != null) {
@@ -185,7 +188,7 @@ public class BusinessLogicFromCaseToCustomIT extends AbstractTemplateTestCase {
 			deleteCaseFromBFlow = getSubFlow("deleteCaseFromBFlow");
 			event = deleteCaseFromBFlow.process(getTestEvent(casesB, MessageExchangePattern.REQUEST_RESPONSE));
 			result = event.getMessage().getPayload();
-			log.info("Delete Case from B result: " + result);
+			LOGGER.info("Delete Case from B result: " + result);
 		}
 	}
 

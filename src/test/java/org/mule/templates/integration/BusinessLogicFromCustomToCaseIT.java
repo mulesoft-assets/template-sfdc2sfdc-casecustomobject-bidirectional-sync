@@ -41,7 +41,7 @@ import com.sforce.soap.partner.SaveResult;
  */
 public class BusinessLogicFromCustomToCaseIT extends AbstractTemplateTestCase {
 
-	private static final Logger log = LogManager.getLogger(BusinessLogicFromCaseToCustomIT.class);
+	private static final Logger LOGGER = LogManager.getLogger(BusinessLogicFromCaseToCustomIT.class);
 	private static final int TIMEOUT_MILLIS = 60;
 	
 	private static final String ANYPOINT_TEMPLATE_NAME = "sfdc2sfdc-case2custom-bidirectional-sync";
@@ -138,13 +138,18 @@ public class BusinessLogicFromCustomToCaseIT extends AbstractTemplateTestCase {
 		MuleEvent event = queryCaseInAFlow.process(getTestEvent(caseA, MessageExchangePattern.REQUEST_RESPONSE));
 
 		ConsumerIterator<Object> queryResult = (ConsumerIterator<Object>) event.getMessage().getPayload();
-		Map<String, Object> customObject = (Map<String, Object>) queryResult.next();  
-		log.info("Query Case from A result " + customObject);
+		Map<String, Object> customObject = queryResult.hasNext() ? (Map<String, Object>) queryResult.next() : null;  
+		LOGGER.info("Query Case from A result " + customObject);
 
 		// Assertions
 		assertNotNull(customObject);
+		
+		caseA.put("Id", customObject.get("Id"));
+		
 		assertEquals("The Id is not the right one: ", caseIdInB, customObject.get("ExtId__c"));
-		assertEquals("The Subject is not the right one: ", this.caseA.get("Subject"), customObject.get("Subject__c"));
+		
+		
+		assertEquals("The Subject is not the right one: ", customObject.get("Subject"), caseB.get("Subject__c"));
 		assertEquals("The Type is not the right one: ", "Case", customObject.get("type"));
 	}
 
@@ -158,7 +163,7 @@ public class BusinessLogicFromCustomToCaseIT extends AbstractTemplateTestCase {
 		MuleEvent event = createCaseInBFlow.process(getTestEvent(casesB, MessageExchangePattern.REQUEST_RESPONSE));
 		List<SaveResult> result = (List<SaveResult>) event.getMessage().getPayload();
 		caseB.put("Id", result.get(0).getId());
-		log.info("Save Case__c to B result " +result.get(0));
+		LOGGER.info("Save Case__c to B result " +result.get(0));
 	}
 
 	private void deleteCases() throws Exception {
@@ -166,12 +171,12 @@ public class BusinessLogicFromCustomToCaseIT extends AbstractTemplateTestCase {
 		Object result = null;
 		
 		if (caseA != null) {
-			List<Object> casesA = new ArrayList<Object>();
+			List<Object> casesA = new ArrayList<Object>();			
 			casesA.add(caseA.get("Id"));
 			
 			event = deleteCaseFromAFlow.process(getTestEvent(casesA, MessageExchangePattern.REQUEST_RESPONSE));
 			result = event.getMessage().getPayload();
-			log.info("Delete Case from A result: " + result);
+			LOGGER.info("Delete Case from A result: " + result);
 		}
 
 		if (caseB != null) {
@@ -181,7 +186,7 @@ public class BusinessLogicFromCustomToCaseIT extends AbstractTemplateTestCase {
 			deleteCaseFromBFlow = getSubFlow("deleteCaseFromBFlow");
 			event = deleteCaseFromBFlow.process(getTestEvent(casesB, MessageExchangePattern.REQUEST_RESPONSE));
 			result = event.getMessage().getPayload();
-			log.info("Delete Case from B result: " + result);
+			LOGGER.info("Delete Case from B result: " + result);
 		}
 	}
 
