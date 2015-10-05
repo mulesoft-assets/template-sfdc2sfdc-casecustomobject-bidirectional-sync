@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Logger;
 public class PollSynchronizer {
 
 	private static final int MAX_PERMITS_NUMBER = 1;
-	private static final Logger log = LogManager.getLogger(PollSynchronizer.class);
+	private static final Logger LOGGER = LogManager.getLogger(PollSynchronizer.class);
 	
 	private Semaphore semaphore;
 
@@ -36,7 +36,7 @@ public class PollSynchronizer {
 		try {
 			getLock().acquire();
 		} catch (InterruptedException e) {
-			log.error(e.getCause(), e);
+			LOGGER.error(e.getCause(), e);
 		}
 	}
 	
