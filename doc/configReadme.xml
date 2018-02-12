@@ -7,19 +7,25 @@
 		<section id="use_case">
 As a Salesforce admin I want to have my Cases from orgA synchronized with Custom objects from Salesforce orgB.
 
-This Template should serve as a foundation for setting an online bi-directional sync of Cases and Custom Objects between two SalesForce instances, being able to specify filtering criteria. 
+This Template should serve as a foundation for setting an online bi-directional sync of Cases and Custom Objects between two 
+Salesforce instances with ability to specify filtering criteria. 
 
-The integration main behavior is polling for changes (new Cases/Custom objects or modified ones) that have occurred in any of the Salesforce instances during a certain defined period of time. For those Cases/Custom objects that both have not been updated yet the integration triggers an upsert (update or create depending the case) taking the last modification as the one that should be applied.
+The main behavior of this template is polling for changes (new or modified Cases/Custom objects) that have occurred in any of the Salesforce 
+instances during a certain defined period of time. For those Cases/Custom objects, that were identified not present in the target instance, the integration triggers 
+an upsert operation (update or create depending on the existence of the object in the target instance) taking the last modification of the object as the one that should be applied.
 
-Additionally, there are two subflows which are synchronizing Accounts and Contacts if the Case in orgA or Case__c custom object in orgB in manner of one time integration.
-If the Account or Contact field in Case object is specified and the Account or Contact does not exist in other org, it will be created for first time.
+Additionally, there are two sub-flows which synchronize Accounts and Contacts if the Case in orgA or Case__c custom object 
+in orgB in manner of one time integration.
+If the Account or Contact field in Case object is specified and the Account or Contact does not exist in the other org, it will be created there for the first time.
 The matching criteria for Account is field 'Account Name'. And matching criteria for Contact is field 'Email'.
 
 Requirements have been set not only to be used as examples, but also to establish starting point to adapt the integration to any given requirements.
 		</section>
 		<section id="considerations">
 <![CDATA[
-To make this Anypoint Template run, there are certain preconditions that must be considered. All of them deal with the preparations in both, that must be made in order for all to run smoothly. **Failling to do so could lead to unexpected behavior of the template.**
+To make this Anypoint Template run, there are certain preconditions that must be considered. All of them deal with the preparations in both, 
+that must be made in order for all to run smoothly. 
+**Failling to do so could lead to unexpected behavior of the template.**
 ]]>
 		</section>
 		<section id="run_it">
@@ -32,33 +38,38 @@ In order to have your application up and running you just need to complete two s
 		</section>
 		<section id="running_on_cloudhub">
 <![CDATA[
-In order to [create your application on CloudHub](http://www.mulesoft.org/documentation/display/current/Hello+World+on+CloudHub) you should to go to Deployment > Advanced to set all environment variables detailed in **Properties to be configured** as well as the **mule.env**. 
+In order to [create your application on CloudHub](http://www.mulesoft.org/documentation/display/current/Hello+World+on+CloudHub) 
+you should to go to Deployment > Advanced to set all environment variables detailed in **Properties to be configured** as well as the **mule.env**. 
 ]]>
 		</section>
 		<section id="default_running_on_standalone">
 <![CDATA[
-Complete all properties in one of the property files, for example in [mule.dev.properties] (../master/src/main/resources/mule.dev.properties) and run your app with the corresponding environment variable to use it. To follow the example, this will be `mule.env=dev`.
+Fill in all properties in one of the property files, for example in [mule.dev.properties] (./src/main/resources/mule.dev.properties) and run your app 
+with the corresponding environment variable to use it. To follow the example, this will be `mule.env=dev`.
 ]]>
 		</section>
 		<section id="application_configuration">
 <![CDATA[
 + polling.frequency `10000`  
-This are the milliseconds that will run between two different checks for updates in Salesforce
+This are the milliseconds that will run between two different checks for updates in either Salesforce instance
 
 + watermark.default.expression `2014-02-25T11:00:00.000Z`  
-This property is an important one, as it configures what should be the start point of the synchronization. If the use case includes synchronizing every contact created from the begining of the times, you should use a date previous to any contact creation (perhaphs `1900-01-01T08:00:00.000Z` is a good choice). If you want to synchronize the contacts created from now on, then you should use a default value according to that requirement (for example, today is Febraury 25th of 2014 and it's eleven o'clock, then I would take the following value `2014-02-25T11:00:00.000Z`).
+This property is an important one, as it configures what should be the start point of the synchronization. If the use case includes synchronization of every 
+contact created from the begining of the times, you should use a date previous to any contact creation (perhaphs `1900-01-01T08:00:00.000Z` is a good choice). 
+If you want to synchronize the contacts created from now on, then you should use a default value according to that requirement (for example, 
+if today is April 21st of 2016 and it's eleven o'clock in London, then you could use the following value `2016-04-21T11:00:00.000Z`).
 
-#### SalesForce Connector configuration for company A
+#### Salesforce Connector configuration for company A
 + sfdc.a.username `bob.dylan@orga`
 + sfdc.a.password `DylanPassword123`
 + sfdc.a.securityToken `avsfwCUl7apQs56Xq2AKi3X`
 + sfdc.a.url `https://login.salesforce.com/services/Soap/u/32.0`
 + sfdc.a.integration.user.id `005d0000000yYC7AAM`
 
-	**Note:** To find out the correct *sfdc.a.integration.user.id* value, please, refer to example project **Salesforce Data Retrieval** in [Anypoint Exchange](http://www.mulesoft.org/documentation/display/current/Anypoint+Exchange).
+	**Note:** To find the correct *sfdc.a.integration.user.id* value, please, refer to example project **Salesforce Data Retrieval** in [Anypoint Exchange](http://www.mulesoft.org/documentation/display/current/Anypoint+Exchange).
  
 
-#### SalesForce Connector configuration for company B
+#### Salesforce Connector configuration for company B
 + sfdc.b.username `joan.baez@orgb`
 + sfdc.b.password `JoanBaez456`
 + sfdc.b.securityToken `ces56arl7apQs56XTddf34X`
@@ -72,13 +83,13 @@ This property is an important one, as it configures what should be the start poi
 
 Polling Frequency is expressed in milliseconds (different time units can be used) and the Watermark Default Expression defines the date to be used to query the first time the integration runs. [More details about polling and watermarking.](http://www.mulesoft.org/documentation/display/current/Poll+Reference)
 
-The date format accepted in SFDC Query Language is either YYYY-MM-DDThh:mm:ss+hh:mm or you can use Constants (Like YESTERDAY in the example). [More information about Dates in SFDC.](http://www.salesforce.com/us/developer/docs/officetoolkit/Content/sforce_api_calls_soql_select_dateformats.htm)
+The date format accepted in SFDC Query Language is either YYYY-MM-DDThh:mm:ss+hh:mm or you can use Constants (Like YESTERDAY in the example). [More information about Dates in Salesforce.](https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_soql_select_dateformats.htm)
 
 The query fields list must include both 'Email' and 'LastModifiedDate' fields, as those fields are embedded in the integration business logic
 
 #### Structure of the Case object
 
-To be able to match pair Case object in orgA with Case custom object in orgB we needed to extend Case object in orgA with following field. 
+To be able to match pair Case object in orgA with Case custom object in orgB we needed to extend Case object in orgA with the following field. 
 
 + ExtId__c `Text(50) External ID` external id which is referencing ID of Case\_\_c in orgB
 
@@ -87,7 +98,8 @@ Feel free to customize the name of this field, but keep in mind that you will ne
 
 #### Structure of the Case Custom object
 
-In this particular template we named the Custom object `Case`, that is the API name of the Custom object in orgB is `Case__c`, so all soql queries, datamapper conversions are issued to this particular object. Case\_\_c custom object inherits all required fields from Case in orgA together with Description\_\_c, Subject\_\_c text fields and
+In this particular template we named the Custom object `Case`, that is the API name of the Custom object in orgB is `Case__c`, so all osql queries, DataWeave conversions are issued to this particular object. 
+Case\_\_c custom object inherits all required fields from Case in orgA together with Description\_\_c, Subject\_\_c text fields and
 Contact\_\_c and Account\_\_c lookup fields.
 
 + Account__c `Lookup(Account)`
@@ -102,31 +114,33 @@ Contact\_\_c and Account\_\_c lookup fields.
 This structure may be customized but keep in mind that you will then need to 
 
 + update query `fetch case__c objects from B` in `endpoints.xml` to fetch all extra fields
-+ update datamapper component `transform Case to Case__c`
-+ update datamapper component `transform Case__c to Case`
++ update DataWeave transformer `transform Case to Case__c`
++ update DataWeave transformer `transform Case__c to Case`
 ]]>
 		</section>
 		<section id="api_calls">
 		<![CDATA[
-SalesForce imposes limits on the number of API Calls that can be made. Therefore calculating this amount may be an important factor to consider. User Anypoint Template calls to the API can be calculated using the formula:
+Salesforce imposes limits on the number of API Calls that can be made. Therefore calculating this amount may be an important factor to consider. 
+User Anypoint Template calls to the API can be calculated using the formula:
 
 ***1 + UsersToSync + UsersToSync / CommitSize***
 
-Being ***UsersToSync*** the number of Users to be synchronized on each run. 
+Where ***UsersToSync*** is the number of Users to be synchronized on each run. 
 
-The division by ***CommitSize*** is because by default, for each Upsert API Call, Users are gathered in groups of a number defined by the Commit Size property. Also consider that this calls are executed repeatedly every polling cycle.	
+The division by ***CommitSize*** is because by default, for each Upsert API Call, Users are gathered in groups of a number defined by the Commit Size property. 
+Also consider that these calls are executed repeatedly every polling cycle.	
 
 For instance if 10 records are fetched from origin instance, then 12 api calls will be made (1 + 10 + 1).
 ]]>
 		</section>
 		<section id="default_endpoints_xml">
 		<![CDATA[
-This is the file where you will found the inbound and outbound sides of your integration app. It is intented to define the application API.
+This is the file where you will find the inbound and outbound sides of your integration app. It is intented to define the application API.
 ]]>
 		</section>
 		<section id="default_business_logic_xml">
 		<![CDATA[
-This file holds the functional aspect of the template , directed by one flow responsible of conducting the business logic.
+This file holds the functional aspect of the template, directed by one flow responsible of conducting the business logic.
 ]]>
 		</section>
 	</sections>
