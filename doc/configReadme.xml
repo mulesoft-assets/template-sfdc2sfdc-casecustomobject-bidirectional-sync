@@ -56,7 +56,7 @@ This are the milliseconds that will run between two different checks for updates
 
 + watermark.default.expression `2018-02-25T11:00:00.000Z`  
 This property is an important one, as it configures what should be the start point of the synchronization. If the use case includes synchronization of every 
-contact created from the begining of the times, you should use a date previous to any contact creation (perhaphs `1900-01-01T08:00:00.000Z` is a good choice). 
+case created from the begining of the times, you should use a date previous to any case creation (perhaphs `1900-01-01T08:00:00.000Z` is a good choice). 
 If you want to synchronize the contacts created from now on, then you should use a default value according to that requirement (for example, 
 if today is April 21st of 2018 and it's eleven o'clock in London, then you could use the following value `2018-04-21T11:00:00.000Z`).
 
@@ -124,9 +124,9 @@ Case/Case custom object Anypoint Template calls to the API can be calculated usi
 
 ***1 + CasesToSync + 2  / CommitSize***
 
-Where ***UsersToSync*** is the number of Users to be synchronized on each run. 
+Where ***CasesToSync*** is the number of Cases to be synchronized on each run. 
 
-The division by ***CommitSize*** is because by default, for each Upsert API Call, Users are gathered in groups of a number defined by the Commit Size property. 
+The division by ***CommitSize*** is because by default, for each Upsert API Call, Cases are gathered in groups of a number defined by the Commit Size property. 
 Also consider that these calls are executed repeatedly every polling cycle.	
 
 For instance if 10 records are fetched from origin instance, then at least 13 api calls will be made (1 + 10 + 2).
