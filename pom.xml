@@ -12,8 +12,7 @@
     <name>template-sfdc2sfdc-casecustomobject-bidirectional-sync</name>
     <properties>
         <mule.connectors.version>1.0.0</mule.connectors.version>
-        <sfdc.connector.version>9.0.0</sfdc.connector.version>
-    </properties>
+        </properties>
     <build>
         <plugins>
             <plugin>
@@ -29,8 +28,8 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.mule.connectors</groupId>
-            <artifactId>mule-sfdc-connector</artifactId>
+            <groupId>com.mulesoft.connectors</groupId>
+            <artifactId>mule-salesforce-connector</artifactId>
             <version>${sfdc.connector.version}</version>
             <classifier>mule-plugin</classifier>
         </dependency>
