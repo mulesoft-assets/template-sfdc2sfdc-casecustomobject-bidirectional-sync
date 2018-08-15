@@ -6,7 +6,7 @@
         <artifactId>templates-tooling-parent-pom</artifactId>
         <version>2.1.2</version>
     </parent>
-    <artifactId>template-sfdc2sfdc-casecustomobject-bidirectonal-sync</artifactId>
+    <artifactId>template-sfdc2sfdc-casecustomobject-bidirectional-sync</artifactId>
     <version>2.1.2-SNAPSHOT</version>
     <packaging>mule-application</packaging>
     <name>template-sfdc2sfdc-casecustomobject-bidirectional-sync</name>
