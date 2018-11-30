@@ -13,8 +13,18 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 	<flow name="fromAtoB" doc:id="27d2dbbb-9ecc-482d-8fe5-4df2dba4f7a2" >
 		<batch:job jobName="fromAtoBBatch" doc:id="6ad7d515-0946-412d-bcdb-e3c805da07af" >
 			<batch:process-records >
+				<batch:step name="StoreCaseAIdStep" doc:id="0421ad96-6747-4229-89be-4cc97798bf75" >
+					<set-variable value="#[payload.Id]" doc:name="Store Id of Case A" doc:id="517672c8-b153-42b2-9d66-5c48c23da87c" variableName="sfdcCaseAId" />
+					<ee:transform doc:name="Remove Id from Case A payload" doc:id="65138a68-8c4d-49db-a33d-f3c5ba1fae8a" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload - 'Id']]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+				</batch:step>
 				<batch:step name="forEachCaseInAGetCase_cFromBStep" acceptExpression="#[payload.ExtId__c != null]">
-					<set-variable value="#[payload.Id]" doc:name="Store Id of Case in A" doc:id="517672c8-b153-42b2-9d66-5c48c23da87c" variableName="sfdcCaseAId" />
 					<salesforce:query-single doc:name="Query Case_c from Salesforce instance B" config-ref="Salesforce_Sfdc_B_config" target="IdDateInB">
 						<salesforce:salesforce-query>SELECT Id,LastModifiedDate FROM Case__c WHERE Id = ':extId'</salesforce:salesforce-query>
 					
@@ -29,14 +39,20 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 							<ee:set-payload><![CDATA[%dw 2.0
 output application/java
 ---
-payload - 'Id' ++ {
+payload ++ {
 	Id: if(vars.IdDateInB !=null) vars.IdDateInB.Id else null, 
 	LastModifiedDateB: if(vars.IdDateInB !=null) vars.IdDateInB.LastModifiedDate else null
 }]]></ee:set-payload>
 						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="caseInBFound" ><![CDATA[%dw 2.0
+output application/java
+---
+if(vars.IdDateInB !=null) vars.IdDateInB.Id else null]]></ee:set-variable>
+						</ee:variables>
 					</ee:transform>
 				</batch:step>
-				<batch:step name="upsertCase_cInBStep" >
+				<batch:step name="upsertCase_cInBStep" acceptExpression="payload.LastModifiedDateB == null or payload.LastModifiedDateB&lt;payload.LastModifiedDate">
 					<set-variable value="#[payload.Account]" doc:name="Set accountToCreate from Case" variableName="accountToCreate"/>
 					<flow-ref doc:name="checkTargetAccountSubflow" name="checkTargetAccountSubflow"/>
 					<set-variable value="#[payload.Contact]" doc:name="Set contactToCreate from Case" doc:id="2db1b9e6-5789-4ccb-bf63-46db74a10233" variableName="contactToCreate"/>
@@ -47,19 +63,21 @@ payload - 'Id' ++ {
 output application/java
 ---
 [{
-	CaseId__c : payload.Id,
+	CaseId__c : vars.sfdcCaseAId,
 	Status__c : payload.Status,
 	Subject__c : payload.Subject,
 	Priority__c : payload.Priority,
 	Description__c : payload.Description,
 	Origin__c : payload.Origin,
-	Id : payload.ExtId__c,
+	Id : payload.Id,
 	Account__c : vars.IdAccountInB.Id,
 	Contact__c : vars.IdContactInB.Id
 }]]]></ee:set-payload>
 							</ee:message>
 						</ee:transform>
-					<salesforce:upsert type="Case__c" doc:name="Upsert - Case_c in instance B" doc:id="518a88b9-d315-4717-8d62-8a3618ed3e69" config-ref="Salesforce_Sfdc_B_config" externalIdFieldName="Id" />
+					<salesforce:upsert type="Case__c" doc:name="Upsert - Case_c in instance B" doc:id="518a88b9-d315-4717-8d62-8a3618ed3e69" config-ref="Salesforce_Sfdc_B_config" externalIdFieldName="Id" target="newCaseBId"/>
+				</batch:step>
+				<batch:step name="UpdateCaseAWithExtId__c" doc:id="9d784ee6-9347-448f-a3fe-11bc8c59c0db" acceptExpression="vars.caseInBFound == null">
 					<ee:transform doc:name="Prepare update of Case in A with ExtId__c" doc:id="16f6d20c-9a5c-4d8a-befb-0c123d2979ca">
 							<ee:message>
 								<ee:set-payload><![CDATA[%dw 2.0
@@ -67,12 +85,11 @@ output application/java
 ---
 [{
 	Id : vars.sfdcCaseAId,
-	ExtId__c: payload[0].Id
+	ExtId__c: vars.newCaseBId[0].id
 }]]]></ee:set-payload>
 							</ee:message>
 						</ee:transform>
 					<salesforce:update type="Case" doc:name="Update Case in A with ExtId__c" doc:id="26c5d764-38d6-4452-b065-03af5d725af2" config-ref="Salesforce_Sfdc_A_config" />
-					<logger level="INFO" doc:name="Log result" doc:id="8588f169-e9e6-47d0-a769-962c3e40b782" message="Log result of update in A #[output application/json --- payload]" />
 				</batch:step>
 			</batch:process-records>
 			<batch:on-complete >
@@ -85,14 +102,24 @@ output application/java
 	<flow name="fromBtoA" doc:id="8759532e-79b7-4789-990c-dc8e162bfd67" >
 		<batch:job jobName="fromBtoABatch" doc:id="204892ae-0d97-4326-beae-310c8d52b7a6">
 			<batch:process-records>
-				<batch:step name="forEachCase_cInBGetCaseFromAStep" doc:id="89713774-362a-4e92-9bdc-41e31802bf38">
-					<set-variable value="#[payload.Id]" doc:name="Store Id of Case__c in B" doc:id="411b34dd-f3c9-4c76-bbc2-7a80fd268f42" variableName="sfdcCase__cAId"/>
+				<batch:step name="StoreCaseBIdStep" doc:id="52abb0db-1a28-40e8-8090-dcddd0310571" >
+					<set-variable value="#[payload.Id]" doc:name="Store Id of Case__c in B" doc:id="411b34dd-f3c9-4c76-bbc2-7a80fd268f42" variableName="sfdcCase__cBId" />
+					<ee:transform doc:name="Remove Id from Case B payload" doc:id="3c81fea2-3ce3-43f0-86be-c8a5f8b9080a" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload - 'Id']]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+				</batch:step>
+				<batch:step name="forEachCase_cInBGetCaseFromAStep" doc:id="89713774-362a-4e92-9bdc-41e31802bf38" acceptExpression="#[payload.CaseId__c != null]">
 					<salesforce:query-single config-ref="Salesforce_Sfdc_A_config" doc:name="Query Case from Salesforce instance A" doc:id="e828fbe5-8917-4833-a479-8df69b560884" target="IdDateInA">
-						<salesforce:salesforce-query>SELECT Id, LastModifiedDate FROM Case WHERE ExtId__c = ':Id'</salesforce:salesforce-query>
-						<salesforce:parameters><![CDATA[#[output applicaton/java
+						<salesforce:salesforce-query>SELECT Id, LastModifiedDate FROM Case WHERE Id = ':Id'</salesforce:salesforce-query>
+						<salesforce:parameters><![CDATA[#[output application/java
 ---
 {
-	"Id" : payload.Id
+	"Id" : payload.CaseId__c
 }]]]></salesforce:parameters>
 					</salesforce:query-single>
 					<ee:transform doc:name="set Id and LastModifiedDate from matching Case" doc:id="c119f87d-9095-4962-b961-efe507b06a0c">
@@ -100,17 +127,23 @@ output application/java
 							<ee:set-payload><![CDATA[%dw 2.0
 output application/java
 ---
-payload - 'Id' ++ {
+payload ++ {
 	Id: if(vars.IdDateInA !=null) vars.IdDateInA.Id else null, 
 	LastModifiedDateA: if(vars.IdDateInA !=null) vars.IdDateInA.LastModifiedDate else null
 }]]></ee:set-payload>
 						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="caseInAFound" ><![CDATA[%dw 2.0
+output application/java
+---
+if(vars.IdDateInA !=null) vars.IdDateInA.Id else null]]></ee:set-variable>
+						</ee:variables>
 					</ee:transform>
 				</batch:step>
-				<batch:step name="upsertCaseInAStep" doc:id="28b57a2f-4e44-4b6c-9bee-5911e742aa24" >
-					<set-variable value="#[payload.Account]" doc:name="Set accountToCreate from Case__c" doc:id="a7c8a812-34da-4c85-8b03-1d126923ffde" variableName="accountToCreate"/>
+				<batch:step name="upsertCaseInAStep" doc:id="28b57a2f-4e44-4b6c-9bee-5911e742aa24" acceptExpression="payload.LastModifiedDateA == null or payload.LastModifiedDateA&lt;payload.LastModifiedDate">
+					<set-variable value="#[payload.Account__c]" doc:name="Set accountToCreate from Case__c" doc:id="a7c8a812-34da-4c85-8b03-1d126923ffde" variableName="accountToCreate"/>
 					<flow-ref doc:name="checkTargetAccountSubflow" doc:id="85c142d9-1f8b-4d76-8194-37db54848fc8" name="checkTargetAccountSubflow"/>
-					<set-variable value="#[payload.Contact]" doc:name="Set contactToCreate from Case__c" doc:id="fdfc34c2-ae12-4e39-9797-aae6f2eda7c5" variableName="contactToCreate"/>
+					<set-variable value="#[payload.Contact__c]" doc:name="Set contactToCreate from Case__c" doc:id="fdfc34c2-ae12-4e39-9797-aae6f2eda7c5" variableName="contactToCreate"/>
 					<flow-ref doc:name="checkTargetContactSubflow" doc:id="642ece10-fa95-4226-aa74-b60df8b66a4d" name="checkTargetContactSubflow"/>
 					<ee:transform doc:name="Transform Case__c to Case" doc:id="cfb03091-7168-4304-b0a9-b74b8a430047">
 							<ee:message>
@@ -122,28 +155,29 @@ output application/java
 	Priority : payload.Priority__c,
 	Origin : payload.Origin__c,
 	Description : payload.Description__c,
-	ExtId__c : payload.Id,
+	ExtId__c : vars.sfdcCase__cBId,
 	Status : payload.Status__c,
-	Id : payload.CaseId__c,
-	AccountId : vars.IdAccountInA.Account__c,
-	ContactId : vars.IdContactInA.Contact__c
+	Id : payload.Id,
+	AccountId : vars.IdAccountInA.Id,
+	ContactId : vars.IdContactInA.Id
 }]]]></ee:set-payload>
 							</ee:message>
 						</ee:transform>
-					<salesforce:upsert type="Case" doc:name="Upsert - Case in instance A" doc:id="b341ecb2-dc9b-45d4-b275-a6850840f4e0" config-ref="Salesforce_Sfdc_A_config" externalIdFieldName="Id" />
-					<ee:transform doc:name="Prepare update of Case__c in B with CaseId__c" doc:id="a7094143-9d86-4aa5-bf95-41cae67fda5a">
-						<ee:message>
-							<ee:set-payload><![CDATA[%dw 2.0
+					<salesforce:upsert type="Case" doc:name="Upsert - Case in instance A" doc:id="b341ecb2-dc9b-45d4-b275-a6850840f4e0" config-ref="Salesforce_Sfdc_A_config" externalIdFieldName="Id" target="newCaseAId"/>
+				</batch:step>
+				<batch:step name="UpdateCaseAWithCaseId__c" doc:id="086053db-5205-45a4-bd5e-a2697755ec26" acceptExpression="vars.caseInAFound == null" >
+					<ee:transform doc:name="Prepare update of Case in B with ExtId__c" doc:id="4c10396a-b1ba-48cc-8348-6315aded2690" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
 output application/java
 ---
 [{
-	Id : vars.sfdcCase__cAId,
-	CaseId__c : payload[0].Id
+	Id : vars.sfdcCase__cBId,
+	CaseId__c: vars.newCaseAId[0].id
 }]]]></ee:set-payload>
 						</ee:message>
 					</ee:transform>
-					<salesforce:update type="Case" doc:name="Update Case__c in B with CaseId__c" doc:id="6f08019d-a7ee-4a05-8718-516059a14d9a" config-ref="Salesforce_Sfdc_B_config" />
-					<logger level="INFO" doc:name="Log result" doc:id="c2a59563-4195-49a2-a49e-48b5e6cefab7" message="Log result of update in B :  #[output application/json --- payload]" />
+					<salesforce:update type="Case__c" doc:name="Update Case in A with ExtId__c" doc:id="d7f98d4a-a3bf-4165-b863-1e5c43cc7ff4" config-ref="Salesforce_Sfdc_B_config" />
 				</batch:step>
 			</batch:process-records>
 			<batch:on-complete >
@@ -201,8 +235,7 @@ output application/java
 				</choice>
 			</when>
 			<otherwise >
-				<logger level="INFO" doc:name="Set null" doc:id="869b562b-7b83-437a-a5d9-afb859e3fc36" message="Set null"/>
-				<set-payload value="null" doc:name="Set null to Payload" doc:id="e45c4197-921f-458f-96d2-d532c027527b" />
+				<logger level="INFO" doc:name="Skipping account create" doc:id="869b562b-7b83-437a-a5d9-afb859e3fc36" message="Skipping account create"/>
 			</otherwise>
 		</choice>
 	</sub-flow>
@@ -253,8 +286,7 @@ output application/java
 				</choice>
 			</when>
 			<otherwise >
-				<logger level="INFO" doc:name="Set null" doc:id="869b562b-7b83-437a-a5d9-afb859e3fc36" message="Set null"/>
-				<set-payload value="null" doc:name="Set null to Payload" doc:id="e45c4197-921f-458f-96d2-d532c027527b" />
+				<logger level="INFO" doc:name="Skipping create contact" doc:id="869b562b-7b83-437a-a5d9-afb859e3fc36" message="Skipping create contact"/>
 			</otherwise>
 		</choice>
 	</sub-flow>
