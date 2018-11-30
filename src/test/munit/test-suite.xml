@@ -58,6 +58,9 @@ output application/json
 	]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
+		<scripting:execute engine="groovy" doc:name="Sleep for 2s until to have different times of creation" doc:id="7ce0cfc8-5e9d-4bd0-a2c4-7138cc265388">
+			<scripting:code>sleep(2000)</scripting:code>
+		</scripting:execute>
 		<ee:transform doc:name="Preparing test data for SFDC B" doc:id="49c92b8f-c639-4bc2-bd67-74b87ecdc7ac">
 			<ee:message />
 			<ee:variables>
@@ -95,6 +98,9 @@ vars.createdSFDCIds ++ "Id_B" : vars.sfdcCreateRetVal.id
 	]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
+		<scripting:execute engine="groovy" doc:name="Sleep for 2s until to have different times of creation" doc:id="65abcc44-7450-4f30-a756-f9f0148a5997">
+			<scripting:code>sleep(2000)</scripting:code>
+		</scripting:execute>
 		<ee:transform doc:name="Connect test case in SFDC A to case in SFDC B" doc:id="7442aeb7-dd1a-4790-b4a1-aeb80f3c1c62">
 			<ee:message>
 			</ee:message>
@@ -111,6 +117,9 @@ output application/java
 		<salesforce:update type="Case" doc:name="Update test case in SFDC A" doc:id="62aa3f12-84c7-4c79-803d-368724049c92" config-ref="Salesforce_Sfdc_A_config">
 			<salesforce:records ><![CDATA[#[vars.sfdsCasesForUpdate]]]></salesforce:records>
 		</salesforce:update>
+		<scripting:execute engine="groovy" doc:name="Sleep for 2s until to have different times of creation" doc:id="2ff6d625-2244-484a-bb57-2156f3213f21">
+			<scripting:code>sleep(2000)</scripting:code>
+		</scripting:execute>
 		<ee:transform doc:name="Preparing test data for SFDC A" doc:id="d22d54be-b37a-4196-98e2-3e080bade1c6">
 			<ee:message />
 			<ee:variables>
@@ -142,6 +151,9 @@ output application/json
 	]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
+		<scripting:execute engine="groovy" doc:name="Sleep for 2s until to have different times of creation" doc:id="b26a83da-6a00-4e0c-a126-319a00227839">
+			<scripting:code>sleep(2000)</scripting:code>
+		</scripting:execute>
 		<ee:transform doc:name="Connect test case in SFDC B to case in SFDC A" doc:id="2baeeadb-9a21-476d-9d03-95375bb083dc">
 			<ee:message />
 			<ee:variables>
