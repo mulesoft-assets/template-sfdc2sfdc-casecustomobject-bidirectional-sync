@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<munit:config name="test-suite.xml" />
+	<configuration-properties doc:name="Configuration properties"
+		file="mule.test.properties" />
+	<configuration-properties doc:name="Configuration properties"
+		file="common.properties" />
+	<configuration-properties doc:name="Configuration properties"
+		file="mule-artifact.properties" />
+		
+	<munit:before-test name="test-suiteBefore_Test"
+		description="Before tests actions" doc:id="f02bffe8-02c5-455b-9df7-be4ed5b788ca">
+		<ee:transform doc:name="Preparing test data for SFDC A"
+			doc:id="90bfdf55-fd4b-4ba9-ad21-36b371324dce">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="sfdsCasesForInsert" ><![CDATA[%dw 2.0
+output application/java
+---
+[
+	{
+		"Description" : "Description_A0",
+		"Subject" : "Test_Subject_A0"
+	},
+	{
+		"Description" : "Description_A1",
+		"Subject" : "Test_Subject_A1"
+	}	
+]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<salesforce:create doc:name="Create 2 test data in SFDC A" doc:id="56461f40-e239-4a67-a5ad-fca242198225" config-ref="Salesforce_Sfdc_A_config" type="Case" target="sfdcCreateRetVal">
+			<salesforce:records ><![CDATA[#[vars.sfdsCasesForInsert]]]></salesforce:records>
+		</salesforce:create>
+		<ee:transform doc:name="Backup ids of created records" doc:id="e8ae0745-fa60-46c5-8cad-73aca041a6f9" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="createdSFDCIds" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Id_A" : vars.sfdcCreateRetVal.id
+}
+	]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Preparing test data for SFDC B" doc:id="49c92b8f-c639-4bc2-bd67-74b87ecdc7ac">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="sfdsCasesForInsert" ><![CDATA[%dw 2.0
+output application/java
+---
+[
+	{
+		"Description__c" : "Description_B0",
+		"Subject__c" : "Test_Subject_B0"
+	},
+	{
+		"Description__c" : "Description_B1",
+		"Subject__c" : "Test_Subject_B1",
+		"CaseId__c" : vars.createdSFDCIds.Id_A[1]
+	},
+	{
+		"Description__c" : "Description_B2",
+		"Subject__c" : "Test_Subject_B2"
+	}
+	
+]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<salesforce:create doc:name="Create 3 test data in SFDC B" doc:id="1a1bd213-48e6-4db5-ba88-323de032f737" config-ref="Salesforce_Sfdc_B_config" target="sfdcCreateRetVal" type="Case__c">
+			<salesforce:records ><![CDATA[#[vars.sfdsCasesForInsert]]]></salesforce:records>
+		</salesforce:create>
+		<ee:transform doc:name="Backup ids of created records" doc:id="3357d59f-3cd5-4c54-99b6-b8f3beb9e3d9" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="createdSFDCIds" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.createdSFDCIds ++ "Id_B" : vars.sfdcCreateRetVal.id
+	]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Connect test case in SFDC A to case in SFDC B" doc:id="7442aeb7-dd1a-4790-b4a1-aeb80f3c1c62">
+			<ee:message>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="sfdsCasesForUpdate" ><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	"Id" : vars.createdSFDCIds.Id_A[1],
+	"ExtId__c" :vars.createdSFDCIds.Id_B[1]
+}]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<salesforce:update type="Case" doc:name="Update test case in SFDC A" doc:id="62aa3f12-84c7-4c79-803d-368724049c92" config-ref="Salesforce_Sfdc_A_config">
+			<salesforce:records ><![CDATA[#[vars.sfdsCasesForUpdate]]]></salesforce:records>
+		</salesforce:update>
+		<ee:transform doc:name="Preparing test data for SFDC A" doc:id="d22d54be-b37a-4196-98e2-3e080bade1c6">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="sfdsCasesForInsert"><![CDATA[%dw 2.0
+output application/java
+---
+[
+	{
+		"Description" : "Description_A2",
+		"Subject" : "Test_Subject_A2",
+		"ExtId__c" : vars.createdSFDCIds.Id_B[2]
+	}
+]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<salesforce:create type="Case" doc:name="Create 1 test data in SFDC A" doc:id="3de42644-de0d-41be-b3b4-57f70a93113e" config-ref="Salesforce_Sfdc_A_config" target="sfdcCreateRetVal" >
+			<salesforce:records ><![CDATA[#[vars.sfdsCasesForInsert]]]></salesforce:records>
+		</salesforce:create>
+		<ee:transform doc:name="Backup ids of created records" doc:id="7ba57e1c-ef84-4c07-8f3b-0baa0a0b9073">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="createdSFDCIds"><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+	"Id_A" : vars.createdSFDCIds.Id_A + vars.sfdcCreateRetVal[0].id,
+	"Id_B" : vars.createdSFDCIds.Id_B
+}
+	]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Connect test case in SFDC B to case in SFDC A" doc:id="2baeeadb-9a21-476d-9d03-95375bb083dc">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="sfdsCasesForUpdate"><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	"Id" : vars.createdSFDCIds.Id_B[2],
+	"CaseId__c" :vars.createdSFDCIds.Id_A[2]
+}]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<salesforce:update type="Case__c" doc:name="Update test case in SFDC B" doc:id="c430d407-5362-46c7-afe2-f19fd50c0801" config-ref="Salesforce_Sfdc_B_config">
+			<salesforce:records><![CDATA[#[vars.sfdsCasesForUpdate]]]></salesforce:records>
+		</salesforce:update>
+	</munit:before-test>
+	<munit:test name="test-suiteA2B" description="MUnit Test" doc:id="5a755da4-62b0-4996-9bf5-10c247124210" >
+		<munit:execution >
+			<flow-ref doc:name="call FromAtoBTestSub_Flow" doc:id="4b001f27-2c6a-4589-ac95-ff9a330ac1d4" name="FromAtoBTestSub_Flow"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="test-suiteB2A" description="MUnit Test" doc:id="d3c8f10c-aae7-447d-9ce2-c1c3f65e8aef" >
+		<munit:execution >
+			<flow-ref doc:name="call FromBtoATestSub_Flow" doc:id="b54b3091-5ef3-4bbd-8aa7-7ee666f4f089" name="FromBtoATestSub_Flow"/>
+		</munit:execution>
+	</munit:test>
+	<sub-flow name="FromAtoBTestSub_Flow" doc:id="8949b083-5aca-43c8-9956-22be4a6f74d0" >
+			<salesforce:query doc:name="Query test records from SFDC A" doc:id="43afb138-de1f-467c-a5e2-22654bc7cf3f" config-ref="Salesforce_Sfdc_A_config">
+				<salesforce:salesforce-query >SELECT Id, Description, Subject, LastModifiedDate, LastModifiedById, Origin, Priority, Status,	ExtId__c, ContactId, Contact.FirstName, Contact.LastName, Contact.Email, AccountId, Account.Name  FROM Case WHERE Subject LIKE ':subject'</salesforce:salesforce-query>
+				<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	"subject" : "Test_Subject_A%"
+}]]]></salesforce:parameters>
+			</salesforce:query>
+			<ee:transform doc:name="Remember test cases A" doc:id="28426d6b-6951-43b3-ad46-cf06d7a55c11" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="testRecordsA" ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<munit-tools:assert-that doc:name="Assert that number of A records is 3" doc:id="0b21b567-8b49-4d4a-a0c3-b526d1a9d978" expression="#[sizeOf(vars.testRecordsA)]" is="#[MunitTools::equalTo(3)]" message="Unexpected number of records in SFDC A  (before A2B)"/>
+			<flow-ref doc:name="call business login in fromAtoB flow" doc:id="5dcec535-ac21-4f81-989f-144c312f4beb" name="fromAtoB"/>
+			<scripting:execute engine="groovy" doc:id="fcceaa5c-01e4-449e-9178-85b06fd16286" doc:name="Sleep for 10s until the processing is completed">
+				<scripting:code>sleep(10000)</scripting:code>
+			</scripting:execute>
+		<salesforce:query doc:name="Query test records from SFDC B" doc:id="7b384094-a5ba-4fdf-ba37-1183fd679855" config-ref="Salesforce_Sfdc_B_config" target="testRecordsB">
+				<salesforce:salesforce-query>SELECT Id,Description__c,Subject__c,LastModifiedDate,LastModifiedById,Origin__c,Priority__c,Status__c, CaseId__c,  Contact__c, Contact__r.FirstName, Contact__r.LastName, Contact__r.Email, Account__c,Account__r.Name   FROM Case__c WHERE Subject__c LIKE ':subject'</salesforce:salesforce-query>
+				<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	"subject" : "Test_Subject_%"
+}]]]></salesforce:parameters>
+			</salesforce:query>
+		<munit-tools:assert-that doc:name="Assert that number of B records is 4" doc:id="935f5007-f568-41de-ad6b-fb4b6c7ea9d3" expression="#[sizeOf(vars.testRecordsB)]" is="#[MunitTools::equalTo(4)]" message="Unexpected number of records in SFDC B (A2B)"/>		
+		<salesforce:query doc:name="Query test records from SFDC A" doc:id="255a2b85-cf9a-46a4-a5f3-ed2ffac91500" config-ref="Salesforce_Sfdc_A_config" target="testRecordsA" >
+			<salesforce:salesforce-query >SELECT Id, Description, Subject, LastModifiedDate, LastModifiedById, Origin, Priority, Status,	ExtId__c, ContactId, Contact.FirstName, Contact.LastName, Contact.Email, AccountId, Account.Name FROM Case WHERE Subject LIKE ':subject'</salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	"subject" : "Test_Subject_%"
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<munit-tools:assert-that doc:name="Assert that number of A records is 3" doc:id="c53fa2f6-345a-4bfe-99d1-20c8699f148a" expression="#[sizeOf(vars.testRecordsA)]" is="#[MunitTools::equalTo(3)]" message="Unexpected number of records in SFDC A (A2B)"/>
+		<ee:transform doc:name="Get 1st A Case" doc:id="aa8824a4-4580-40f4-8e00-4d34bca92920" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="caseA" ><![CDATA[%dw 2.0
+output application/java
+---
+vars.testRecordsA filter ($.Id == vars.createdSFDCIds.Id_A[0])]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<munit-tools:assert-that doc:name="Assert that case A has ExtId not null" doc:id="0d33390a-2648-4305-954f-52f49e25f84c" expression="#[vars.caseA[0].ExtId__c]" is="#[MunitTools::notNullValue()]" message="Case A has not been inserted to SFDC B" />
+		<ee:transform doc:name="Get 2nd Cases from A and B" doc:id="5e2c11f8-a2ea-42a7-b5cb-1dc88ff4ece1" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="caseB" ><![CDATA[%dw 2.0
+output application/java
+---
+vars.testRecordsB filter ($.Id == vars.createdSFDCIds.Id_B[1])]]></ee:set-variable>
+				<ee:set-variable variableName="caseA" ><![CDATA[%dw 2.0
+output application/java
+---
+vars.testRecordsA filter ($.Id == vars.createdSFDCIds.Id_A[1])]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<munit-tools:assert-that doc:name="Assert that case B has description from case A" doc:id="ebcb8394-7df7-4d91-b7ab-0b370aa26e50" expression="#[vars.caseB[0].Description__c]" is="#[MunitTools::equalTo(vars.caseA[0].Description)]" message="Case A has not been updated in SFDC B" />
+		<ee:transform doc:name="Get 3rd Cases from A and B" doc:id="7da1f01d-4d19-400c-a050-202dbf8beb71" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="caseB" ><![CDATA[%dw 2.0
+output application/java
+---
+vars.testRecordsB filter ($.Id == vars.createdSFDCIds.Id_B[2])]]></ee:set-variable>
+				<ee:set-variable variableName="caseA" ><![CDATA[%dw 2.0
+output application/java
+---
+vars.testRecordsA filter ($.Id == vars.createdSFDCIds.Id_A[2])]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<munit-tools:assert-that doc:name="Assert that case B hasn't description from case B" doc:id="f96446f3-2739-4ba1-b130-300201792107" expression="#[vars.caseB[0].Description__c]" message="Case A has been updated in SFDC B" is="#[MunitTools::not(MunitTools::equalTo(vars.caseA[0].Description))]"/>				
+	
+</sub-flow>
+	<sub-flow name="FromBtoATestSub_Flow" doc:id="37e3a9f2-6e6d-4316-b3ae-43761ec281f4" >
+				<salesforce:query doc:name="Query test records from SFDC B" doc:id="6d8d50a0-341f-4cfa-a10e-9e1b0ae02dad" config-ref="Salesforce_Sfdc_B_config">
+					<salesforce:salesforce-query>SELECT Id,Description__c,Subject__c,LastModifiedDate,LastModifiedById,Origin__c,Priority__c,Status__c, CaseId__c,  Contact__c, Contact__r.FirstName, Contact__r.LastName, Contact__r.Email, Account__c,Account__r.Name   FROM Case__c WHERE Subject__c LIKE ':subject'</salesforce:salesforce-query>
+					<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	"subject" : "Test_Subject_B%"
+}]]]></salesforce:parameters>
+				</salesforce:query>
+				<ee:transform doc:name="Remember test cases A" doc:id="56bb8385-fea7-426c-ad5c-f67030677d3f">
+					<ee:message />
+					<ee:variables>
+					<ee:set-variable variableName="testRecordsB" ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<munit-tools:assert-that doc:name="Assert that number of B records is 3" doc:id="d1be3854-fb02-430b-9e22-9bbae802f313" expression="#[sizeOf(vars.testRecordsB)]" is="#[MunitTools::equalTo(3)]" message="Unexpected number of records in SFDC B (before B2A)" />
+				<flow-ref doc:name="call business login in fromBtoA flow" doc:id="1cba8332-6236-4cd9-a2c3-0c086cc4254f" name="fromBtoA" />
+				<scripting:execute engine="groovy" doc:name="Sleep for 10s until the processing is completed" doc:id="94bb1a2b-8ce5-432a-b7f1-1d851936e5f0">
+					<scripting:code>sleep(10000)</scripting:code>
+				</scripting:execute>
+				<salesforce:query doc:name="Query test records from SFDC A" doc:id="ee0b177c-561e-49fa-9310-dbe4452a0079" config-ref="Salesforce_Sfdc_A_config" target="testRecordsA">
+					<salesforce:salesforce-query>SELECT Id, Description, Subject, LastModifiedDate, LastModifiedById, Origin, Priority, Status,	ExtId__c, ContactId, Contact.FirstName, Contact.LastName, Contact.Email, AccountId, Account.Name FROM Case WHERE Subject LIKE ':subject'</salesforce:salesforce-query>
+					<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	"subject" : "Test_Subject_%"
+}]]]></salesforce:parameters>
+				</salesforce:query>
+				<munit-tools:assert-that doc:name="Assert that number of A records is 4" doc:id="d17c207f-81eb-4dd4-b710-316020622ae0" expression="#[sizeOf(vars.testRecordsA)]" is="#[MunitTools::equalTo(4)]" message="Unexpected number of records in SFDC A (B2A)" />
+		<salesforce:query doc:name="Query test records from SFDC B" doc:id="70e3bc69-571c-4499-9967-07d51d365a4d" config-ref="Salesforce_Sfdc_B_config" target="testRecordsB" >
+			<salesforce:salesforce-query >SELECT Id,Description__c,Subject__c,LastModifiedDate,LastModifiedById,Origin__c,Priority__c,Status__c, CaseId__c,  Contact__c, Contact__r.FirstName, Contact__r.LastName, Contact__r.Email, Account__c,Account__r.Name   FROM Case__c WHERE Subject__c LIKE ':subject'</salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	"subject" : "Test_Subject_%"
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<munit-tools:assert-that doc:name="Assert that number of B records is 3" doc:id="79ba8355-aa6f-4839-ae86-510c76146ff4" expression="#[sizeOf(vars.testRecordsB)]" is="#[MunitTools::equalTo(3)]" message="Unexpected number of records in SFDC B (B2A)"/>
+		<ee:transform doc:name="Get 1st B Case" doc:id="efd7955a-270a-4485-8219-a7e8a64e3de7" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="caseB" ><![CDATA[%dw 2.0
+output application/java
+---
+vars.testRecordsB filter ($.Id == vars.createdSFDCIds.Id_B[0])]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<munit-tools:assert-that doc:name="Assert that case B has CaseId__c not null" doc:id="7aedd61f-f2fb-4e0c-b8ea-ef3d535c7674" expression="#[vars.caseB[0].CaseId__c]" is="#[MunitTools::notNullValue()]" message="Case B has not been synced to SFDC A" />
+		<ee:transform doc:name="Get 2nd Cases from A and B" doc:id="9083efde-a2f4-45ac-b543-e620fdea423c" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="caseB" ><![CDATA[%dw 2.0
+output application/java
+---
+vars.testRecordsB filter ($.Id == vars.createdSFDCIds.Id_B[1])]]></ee:set-variable>
+				<ee:set-variable variableName="caseA" ><![CDATA[%dw 2.0
+output application/java
+---
+vars.testRecordsA filter ($.Id == vars.createdSFDCIds.Id_A[1])]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<munit-tools:assert-that doc:name="Assert that case A hasn't description from case B" doc:id="843b5779-d6da-479a-ad7a-fa4b35d6a65a" expression="#[vars.caseA[0].Description]" is="#[MunitTools::not(MunitTools::equalTo(vars.caseB[0].Description__c))]" message="Case B has been updated in SFDC A" />
+		<ee:transform doc:name="Get 3rd Cases from A and B" doc:id="3aac7ef7-6aaa-4b65-be4c-be4a3b30b3bc" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="caseB" ><![CDATA[%dw 2.0
+output application/java
+---
+vars.testRecordsB filter ($.Id == vars.createdSFDCIds.Id_B[2])]]></ee:set-variable>
+				<ee:set-variable variableName="caseA" ><![CDATA[%dw 2.0
+output application/java
+---
+vars.testRecordsA filter ($.Id == vars.createdSFDCIds.Id_A[2])]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<munit-tools:assert-that doc:name="Assert that case A has description from case B" doc:id="fc609919-9625-4526-830c-7e3f80850398" expression="#[vars.caseA[0].Description]" is="#[MunitTools::equalTo(vars.caseB[0].Description__c)]" message="Case B has not been updated in SFDC A" />
+		
+	
+</sub-flow>
+	<munit:after-test name="test-suiteAfter_Test" description="After tests actions" doc:id="ae004859-938b-4c63-918e-4d3419818d6f" >
+		<salesforce:query doc:name="Query test records from SFDC A" doc:id="aed65dcc-2265-4446-b469-98704c759a7b" config-ref="Salesforce_Sfdc_A_config">
+			<salesforce:salesforce-query >SELECT Id FROM Case WHERE Subject LIKE ':subject'</salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	"subject" : "Test_Subject_%"
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Prepare Ids for delete" doc:id="a523194b-cdd2-49cc-b15b-8722d6a7c1b3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload map ($.Id)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:delete doc:name="Delete test records in SFDC A" doc:id="8f174d29-1866-4938-bdb6-3f43eea0a9d5" config-ref="Salesforce_Sfdc_A_config">
+		</salesforce:delete>
+		<salesforce:query doc:name="Query test records from SFDC B" doc:id="9bc24e19-b6d6-4d82-a5dd-548201255ba4" config-ref="Salesforce_Sfdc_B_config">
+			<salesforce:salesforce-query >SELECT Id FROM Case__c WHERE Subject__c LIKE ':subject'</salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	"subject" : "Test_Subject_%"
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Prepare Ids for delete" doc:id="28c6368d-5a4e-4b26-b33a-ca54712cfbcb">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload map ($.Id)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:delete doc:name="Delete test records in SFDC B" doc:id="b8cba39e-80be-410c-8b18-3be61d08f75a" config-ref="Salesforce_Sfdc_B_config"/>
+	
+</munit:after-test>		
+
+</mule>
