@@ -11,10 +11,6 @@
     <packaging>mule-application</packaging>
     <name>template-sfdc2sfdc-casecustomobject-bidirectional-sync</name>
     
-    <properties>
-        <munit.version>2.1.4</munit.version>
-    </properties>
-    
     <build>
         <plugins>
             <plugin>
